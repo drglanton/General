@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thomas W. Glanton Jr.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0d0d0d;
+      --paper: #f5f0e8;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --muted: #6b6456;
+      --rule: rgba(201,168,76,0.25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.6;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 4rem 0 3rem;
+      border-bottom: 1px solid var(--rule);
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 300;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    h1 span {
+      display: block;
+      color: var(--gold);
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 520px;
+    }
+
+    /* ── Divider ── */
+    .rule {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 2.5rem 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+    .rule::before, .rule::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+    .rule-diamond {
+      width: 6px;
+      height: 6px;
+      background: var(--gold);
+      transform: rotate(45deg);
+    }
+
+    /* ── About ── */
+    .about {
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--rule);
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.3s forwards;
+    }
+
+    .section-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .about p {
+      font-size: 0.82rem;
+      font-weight: 300;
+      line-height: 2;
+      color: var(--muted);
+      max-width: 600px;
+    }
+
+    /* ── Focus Areas ── */
+    .focus {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--rule);
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+
+    .focus-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0;
+      margin-top: 1.5rem;
+    }
+
+    .focus-item {
+      padding: 1.5rem 0;
+      border-right: 1px solid var(--rule);
+      padding-right: 2rem;
+      padding-left: 0;
+    }
+
+    .focus-item:last-child { border-right: none; padding-right: 0; }
+    .focus-item:not(:first-child) { padding-left: 2rem; }
+
+    .focus-num {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+    }
+
+    .focus-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .focus-desc {
+      font-size: 0.7rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* ── Connect ── */
+    .connect {
+      padding: 3rem 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.55s forwards;
+    }
+
+    .connect-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .connect-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .connect-link:hover {
+      background: var(--gold);
+      color: var(--paper);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.65s forwards;
+    }
+
+    .footer-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.85rem;
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    /* ── Corner mark ── */
+    .corner-mark {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--gold);
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.1s forwards;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .focus-grid { grid-template-columns: 1fr; }
+      .focus-item { border-right: none; border-bottom: 1px solid var(--rule); padding-left: 0 !important; padding-right: 0 !important; }
+      .focus-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="corner-mark">G</div>
+
+  <div class="container">
+
+    <header>
+      <p class="eyebrow">Thomas W. Glanton Jr. &nbsp;·&nbsp; McDonough, GA</p>
+      <h1>Builder.<br><span>Strategist.</span></h1>
+      <p class="tagline">Consulting · Business Operations · Financial Strategy<br>Helping organizations clarify direction and build systems that scale.</p>
+    </header>
+
+    <div class="rule"><div class="rule-diamond"></div></div>
+
+    <section class="about">
+      <p class="section-label">About</p>
+      <p>
+        I'm Thomas — a consultant, entrepreneur, and operations strategist. Through EDCO and related ventures, I work at the intersection of business development, financial clarity, and operational efficiency. My focus is on building durable systems that allow businesses to grow with intention.
+      </p>
+    </section>
+
+    <section class="focus">
+      <p class="section-label">Areas of Focus</p>
+      <div class="focus-grid">
+        <div class="focus-item">
+          <p class="focus-num">01</p>
+          <p class="focus-title">Consulting</p>
+          <p class="focus-desc">Strategy, operations, and growth advisory for businesses at every stage.</p>
+        </div>
+        <div class="focus-item">
+          <p class="focus-num">02</p>
+          <p class="focus-title">Financial Systems</p>
+          <p class="focus-desc">Debt architecture, cash flow planning, and capital allocation frameworks.</p>
+        </div>
+        <div class="focus-item">
+          <p class="focus-num">03</p>
+          <p class="focus-title">Marketing & Brand</p>
+          <p class="focus-desc">Building presence, positioning, and systems that generate consistent leads.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="connect">
+      <p class="section-label">Connect</p>
+      <div class="connect-links">
+        <a class="connect-link" href="mailto:thomas@edcoconsulting.com">
+          ✉ Email
+        </a>
+        <a class="connect-link" href="https://linkedin.com/in/thomasglanton" target="_blank" rel="noopener">
+          ↗ LinkedIn
+        </a>
+        <a class="connect-link" href="https://github.com/thomaswglantonjr" target="_blank" rel="noopener">
+          ↗ GitHub
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <span class="footer-name">Thomas W. Glanton Jr.</span>
+      <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script> · All rights reserved</span>
+    </footer>
+
+  </div>
+
+</body>
+</html>
