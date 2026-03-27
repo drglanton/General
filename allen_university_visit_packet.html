@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Allen University — Official Visit Packet</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #000000;
+    --black: #000000;
+    --white: #ffffff;
+    --dark-gray: #1A1A1A;
+    --mid-gray: #444444;
+    --light-gray: #F0F0F0;
+    --gold-light: #E8E8E8;
+    --accent: #333333;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--white);
+    color: var(--black);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+    border: 8px solid var(--black);
+    page-break-after: always;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: -50px;
+    width: 350px; height: 350px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  }
+
+  .cover-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative; z-index: 1;
+  }
+
+  .cover-badge {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    border-radius: 2px;
+  }
+
+  .cover-date {
+    font-size: 13px;
+    color: #888888;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .cover-main {
+    position: relative; z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 0 40px;
+  }
+
+  .cover-eyebrow {
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #555555;
+    margin-bottom: 20px;
+  }
+
+  .cover-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 10vw, 120px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+  }
+
+  .cover-title span { color: #444444; }
+
+  .cover-sub {
+    font-size: 17px;
+    color: #555555;
+    max-width: 520px;
+    font-weight: 300;
+  }
+
+  .cover-footer {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(0,0,0,0.15);
+  }
+
+  .cover-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cover-stat-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888888;
+  }
+
+  .cover-stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: #000000;
+    letter-spacing: 1px;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    padding: 70px 60px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    page-break-inside: avoid;
+  }
+
+  .section:nth-child(even) {
+    background: var(--light-gray);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .section-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    line-height: 1;
+    color: #CCCCCC;
+    margin-right: 4px;
+  }
+
+  .section-title-group {
+    border-left: 4px solid var(--gold);
+    padding-left: 18px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #555555;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--black);
+  }
+
+  /* ── CARDS ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--white);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: #000000;
+  }
+
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: var(--black);
+  }
+
+  .card-body {
+    font-size: 13.5px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* ── QUESTIONS ── */
+  .question-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .question-item {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 0 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    align-items: start;
+  }
+
+  .question-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: #888888;
+    line-height: 1.4;
+  }
+
+  .question-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--black);
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+
+  .question-why {
+    font-size: 12.5px;
+    color: #888;
+    font-style: italic;
+  }
+
+  /* ── WORKOUT CHECKLIST ── */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .check-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    background: var(--white);
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.07);
+  }
+
+  .check-box {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #000000;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .check-content { flex: 1; }
+  .check-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  .check-desc { font-size: 12.5px; color: #777; }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  /* ── HIGHLIGHT BOX ── */
+  .highlight-box {
+    background: var(--black);
+    color: var(--white);
+    border-radius: 8px;
+    padding: 32px;
+    margin: 30px 0;
+  }
+
+  .highlight-box h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: #ffffff;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  .highlight-box p, .highlight-box li {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.7;
+  }
+
+  .highlight-box ul { padding-left: 20px; }
+  .highlight-box li { margin-bottom: 6px; }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #000000, #cccccc);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 28px;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -34px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    background: #000000;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    box-shadow: 0 0 0 2px #000000;
+  }
+
+  .timeline-time {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: #555555;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+
+  .timeline-desc {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--black);
+    margin-bottom: 3px;
+  }
+
+  .timeline-note {
+    font-size: 12.5px;
+    color: #888;
+    font-style: italic;
+  }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin: 30px 0;
+  }
+
+  .stat-box {
+    text-align: center;
+    padding: 24px 16px;
+    background: var(--black);
+    border-radius: 8px;
+    color: var(--white);
+  }
+
+  .stat-box-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: #ffffff;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-box-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* ── INFO TABLE ── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .info-table tr {
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+  }
+
+  .info-table td {
+    padding: 12px 6px;
+    font-size: 14px;
+  }
+
+  .info-table td:first-child {
+    font-weight: 600;
+    color: #444;
+    width: 200px;
+  }
+
+  /* ── MINDSET SECTION ── */
+  .mindset-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .mindset-card {
+    padding: 24px;
+    border-radius: 8px;
+  }
+
+  .mindset-do {
+    background: #F0FFF4;
+    border: 1px solid #A3E4B4;
+  }
+
+  .mindset-dont {
+    background: #FFF5F5;
+    border: 1px solid #FEC5C5;
+  }
+
+  .mindset-card h4 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .mindset-do h4 { color: #1D7A3D; }
+  .mindset-dont h4 { color: #C0392B; }
+
+  .mindset-card ul {
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .mindset-card li {
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  .mindset-do li { color: #1A5C30; }
+  .mindset-dont li { color: #922B21; }
+
+  /* ── PRINT ── */
+  @media print {
+    .cover { min-height: 100vh; }
+    .section { page-break-inside: avoid; }
+    body { font-size: 13px; }
+  }
+
+  /* ── FOOTER ── */
+  .doc-footer {
+    background: var(--black);
+    color: rgba(255,255,255,0.4);
+    padding: 30px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .doc-footer span:first-child { color: #ffffff; font-weight: 600; }
+
+  /* responsive for screen */
+  @media (max-width: 700px) {
+    .cover, .section { padding: 36px 24px; }
+    .two-col, .card-grid, .stats-row, .mindset-grid { grid-template-columns: 1fr; }
+    .cover-footer { grid-template-columns: 1fr 1fr; }
+    .cover-title { font-size: 56px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ COVER ══════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <span class="cover-badge">🏀 Official Visit Packet</span>
+    <span class="cover-date">March 27, 2026</span>
+  </div>
+
+  <div class="cover-main">
+    <p class="cover-eyebrow">Columbia, South Carolina</p>
+    <h1 class="cover-title">Allen<br><span>Univer-<br>sity</span></h1>
+    <p class="cover-sub">Everything you need for a successful college visit, scholarship conversation, and workout with the Yellow Jackets.</p>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-stat">
+      <span class="cover-stat-label">Founded</span>
+      <span class="cover-stat-value">1870</span>
+    </div>
+    <div class="cover-stat">
+      <span class="cover-stat-label">Conference</span>
+      <span class="cover-stat-value">SIAC / NCAA D-II</span>
+    </div>
+    <div class="cover-stat">
+      <span class="cover-stat-label">Colors</span>
+      <span class="cover-stat-value">Gold &amp; Black</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ SECTION 1 – SCHOOL OVERVIEW ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">01</span>
+    <div class="section-title-group">
+      <p class="section-label">Know Before You Go</p>
+      <h2 class="section-title">About Allen University</h2>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-box-num">~635</div>
+      <div class="stat-box-label">Undergrad Students</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-num">156</div>
+      <div class="stat-box-label">Years of History</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-num">$13,340</div>
+      <div class="stat-box-label">Tuition / Year</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-num">HBCU</div>
+      <div class="stat-box-label">Heritage & Legacy</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:14px;">History & Identity</h3>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">Allen University was founded in 1870 as Payne Institute by ministers of the African Methodist Episcopal (AME) Church, with the original mission of educating freed slaves and newly emancipated African Americans. In 1880, it relocated to Columbia, SC and was renamed Allen University in honor of Bishop Richard Allen — the founder of the AME Church — making it <strong>the first university in South Carolina founded by African Americans for African Americans.</strong></p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">The campus itself is listed on the <strong>National Register of Historic Places</strong> as the Allen University Historic District. Chappelle Auditorium is historically significant — it was the site of the original meeting that set in motion <em>Brown v. Board of Education.</em></p>
+      <p style="font-size:14px; color:#444;">Today Allen is a small, faith-grounded liberal arts institution with an estimated $30M+ annual economic impact on the Columbia community, and a strong legacy of producing educators, clergymen, and elected officials.</p>
+    </div>
+
+    <div>
+      <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:14px;">School Snapshot</h3>
+      <table class="info-table">
+        <tr><td>Type</td><td>Private, HBCU, Christian (AME)</td></tr>
+        <tr><td>Location</td><td>1530 Harden St., Columbia, SC 29204</td></tr>
+        <tr><td>Phone</td><td>803-376-5700</td></tr>
+        <tr><td>Enrollment</td><td>~635 undergrads (small, tight-knit)</td></tr>
+        <tr><td>Tuition</td><td>$13,340/year (~$6,270/semester)</td></tr>
+        <tr><td>Room &amp; Board</td><td>~$7,894/year ($3,947/semester)</td></tr>
+        <tr><td>Total Cost</td><td>~$14,304 (tuition &amp; fees)</td></tr>
+        <tr><td>Aid</td><td>Test-optional; avg grant aid $13,755</td></tr>
+        <tr><td>Accreditation</td><td>SACSCOC (Southern Assoc. of Colleges)</td></tr>
+        <tr><td>Athletics</td><td>NCAA Division II – SIAC</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="margin-top:30px;">
+    <h3>🗝️ Key Talking Point</h3>
+    <p>Allen is one of the most affordable HBCUs in the country. At roughly $13K/year in tuition before aid, an athletic scholarship can dramatically reduce your total cost. The average student receiving grant aid pays approximately <strong>$13,862 net price</strong> — and athletic aid stacks on top of academic aid in many cases. Come prepared to discuss the full financial picture.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ SECTION 2 – ACADEMICS ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">02</span>
+    <div class="section-title-group">
+      <p class="section-label">Academic Programs</p>
+      <h2 class="section-title">What You Can Study</h2>
+    </div>
+  </div>
+
+  <p style="font-size:14px; color:#555; max-width:700px; margin-bottom:30px;">Allen is a liberal arts school. Class sizes are small, professors are accessible, and the environment is built for students who need personalized support. Their popular majors are a good fit for a student-athlete aiming for a post-basketball career.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">💼</div>
+      <div class="card-title">Business Administration</div>
+      <div class="card-body">One of Allen's strongest programs. Covers management, entrepreneurship, marketing, and finance. Great foundation for post-athletic career or starting a business.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏟️</div>
+      <div class="card-title">Sports Management</div>
+      <div class="card-body">A standout major for student-athletes. Covers athletic administration, sports marketing, facility management, and agency work. Allen also offers a graduate program in this area.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔢</div>
+      <div class="card-title">Mathematics</div>
+      <div class="card-body">Strong STEM offering with applications in data analytics, finance, and engineering. Good for graduate school pathways.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧬</div>
+      <div class="card-title">Biology</div>
+      <div class="card-body">Pre-med pathway available. Small class sizes means direct access to lab resources and faculty mentors.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤝</div>
+      <div class="card-title">Social Sciences</div>
+      <div class="card-body">Covers sociology, psychology, political science, and criminal justice tracks. Strong community engagement component.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">✝️</div>
+      <div class="card-title">Dickerson-Green Seminary</div>
+      <div class="card-body">Graduate-level theological program. Master of Arts in Religion and Master of Divinity available for those with ministry interests.</div>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="margin-top:30px;">
+    <h3>📚 For the Student-Athlete</h3>
+    <ul>
+      <li>Small enrollment (~635 students) means you won't get lost. Professors know your name.</li>
+      <li>First-generation and Pell Grant-eligible students are the primary population — the school is built to support students who need extra academic help.</li>
+      <li>Allen has academic support services specifically for student-athletes. Ask about tutoring, study hall requirements, and eligibility monitoring.</li>
+      <li>The Boeing Institute on Civility offers professional development and leadership programming on campus.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ SECTION 3 – BASKETBALL PROGRAM ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">03</span>
+    <div class="section-title-group">
+      <p class="section-label">Yellow Jackets Basketball</p>
+      <h2 class="section-title">The Program</h2>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:16px;">Head Coach: Doug Whittler</h3>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">Coach Whittler was hired in June 2025, arriving from Morehouse College where he spent four years as head coach and compiled a <strong>76-40 overall record (65.5% win rate)</strong> and <strong>59-21 in SIAC conference play (73.4%)</strong> — the highest win total for any Morehouse coach in their first four seasons.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">His Morehouse teams won <strong>three consecutive SIAC division titles</strong>. He was also selected as one of four head coaches nationally to serve as co-head coach in the 2025 HBCU All-Star Game.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">He was named interim head coach at Morehouse in 2021 following the passing of longtime coach Grady Brewer, then elevated to full head coach and immediately produced winning seasons.</p>
+      <p style="font-size:14px; color:#444;"><strong>Bottom line:</strong> Coach Whittler is a proven, high-level SIAC coach who came to Allen to build something. This is a ground-floor opportunity at a program on the rise.</p>
+
+      <div style="background:#F5F5F5; border-radius:6px; padding:16px; margin-top:20px;">
+        <p style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#888; margin-bottom:8px;">Coaching Staff</p>
+        <table class="info-table">
+          <tr><td>Head Coach</td><td><strong>Doug Whittler</strong> — 803-376-5807</td></tr>
+          <tr><td>Associate Head / Recruiting</td><td><strong>Terrell Polk</strong></td></tr>
+          <tr><td>Athletic Director</td><td><strong>Stanley Cromartie</strong></td></tr>
+          <tr><td>Assoc. AD / Compliance</td><td><strong>Deslyn Haywood</strong> — 803-376-5930</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:16px;">Program Status (2025–26)</h3>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">The 2025–26 season is Coach Whittler's first at Allen. The team was <strong>predicted to finish last in the SIAC</strong> in the preseason — a motivating chip on the shoulder. Early in the season they were competitive in close games, showing strong character despite tight losses.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">A December 2025 game recap described the team as "on the cusp of turning the corner — competing toe-to-toe with SIAC opponents and proving they belong in every game." Key returning player <strong>Jacquez Shuler</strong> (junior forward) logged a double-double (13 pts, 10 reb, 5 ast) in a competitive loss.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">This is a <strong>rebuilding year with a high-caliber new coaching staff</strong> — exactly the kind of program where a skilled recruit can come in and earn immediate playing time and impact.</p>
+
+      <div style="background:#F5F5F5; border-radius:6px; padding:16px; margin-top:20px;">
+        <p style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#888; margin-bottom:8px;">Program Info</p>
+        <table class="info-table">
+          <tr><td>Conference</td><td>SIAC (Eastern Division)</td></tr>
+          <tr><td>Division</td><td>NCAA Division II</td></tr>
+          <tr><td>D-II Full Member Since</td><td>2022–23 season</td></tr>
+          <tr><td>Home Court</td><td>John Hurst Adams Gymnasium</td></tr>
+          <tr><td>Nickname</td><td>Yellow Jackets</td></tr>
+          <tr><td>Recruiting Portal</td><td>ARMS Software (men's basketball)</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="margin-top:30px;">
+    <h3>🔥 Why This Is an Opportunity</h3>
+    <ul>
+      <li><strong>New coach, blank roster slate.</strong> Whittler is building his roster from scratch at Allen — he's actively looking for players who fit his system. This is not a program where every spot is locked up.</li>
+      <li><strong>Ground floor of something real.</strong> Whittler did it at Morehouse (three titles). He's not coming to Allen to lose. Getting in early means being part of the rise.</li>
+      <li><strong>SIAC is the premier HBCU conference.</strong> You'll compete against historically significant programs with high visibility in the HBCU community.</li>
+      <li><strong>NIL available.</strong> Allen has a Yellow Jacket NIL Collective. Ask about name-image-likeness opportunities.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ SECTION 4 – QUESTIONS FOR THE COACH ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">04</span>
+    <div class="section-title-group">
+      <p class="section-label">Be Prepared. Be Sharp.</p>
+      <h2 class="section-title">Questions to Ask the Coach</h2>
+    </div>
+  </div>
+
+  <p style="font-size:14px; color:#555; max-width:700px; margin-bottom:30px;">Asking the right questions shows maturity, preparation, and genuine interest. Don't just sit back — coaches are evaluating how you think and carry yourself off the court as much as on it. Here are the most important questions, grouped by category.</p>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin-bottom:16px; color:#888;">🏀 About the Program & Your Role</h3>
+  <div class="question-list">
+    <div class="question-item">
+      <span class="question-num">01</span>
+      <div>
+        <p class="question-text">What does my role look like on this team — and what do I need to do to earn more responsibility?</p>
+        <p class="question-why">Shows you're competitive and coachable. Tells you if they see you as a starter, rotational player, or project.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">02</span>
+      <div>
+        <p class="question-text">What does your system look like — and where do you see my skill set fitting in?</p>
+        <p class="question-why">Understand if their style of play suits your game (pace, spacing, defensive scheme, positional roles).</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">03</span>
+      <div>
+        <p class="question-text">How many scholarships are available, and what does a scholarship package look like here?</p>
+        <p class="question-why">NCAA D-II programs have a maximum of 10 men's basketball scholarships. Know exactly what's on the table — full vs. partial.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">04</span>
+      <div>
+        <p class="question-text">Where do you see this program in two to three years, and what's your vision for building it?</p>
+        <p class="question-why">Given Coach Whittler's track record at Morehouse, you want to hear his plan. Shows you think long-term.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">05</span>
+      <div>
+        <p class="question-text">What separates the players who thrive here from the ones who don't?</p>
+        <p class="question-why">Lets you assess cultural fit and understand what the coach values most in his players.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#888;">💰 About Scholarship & Finances</h3>
+  <div class="question-list">
+    <div class="question-item">
+      <span class="question-num">06</span>
+      <div>
+        <p class="question-text">Can athletic aid be combined with academic scholarships or financial aid to cover the full cost of attendance?</p>
+        <p class="question-why">Critical financial question. Some schools stack aid, others don't. Allen's low tuition means a partial scholarship can go very far.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">07</span>
+      <div>
+        <p class="question-text">What happens to my scholarship if I get injured? Is it renewable each year?</p>
+        <p class="question-why">Protects your interests. You want guaranteed multi-year aid, not a single-year offer that can be pulled.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">08</span>
+      <div>
+        <p class="question-text">Is there a NIL program or collective here, and how does that work for athletes?</p>
+        <p class="question-why">Allen has a Yellow Jacket NIL Collective — real supplemental income opportunity worth asking about.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#888;">📚 About Academic Support</h3>
+  <div class="question-list">
+    <div class="question-item">
+      <span class="question-num">09</span>
+      <div>
+        <p class="question-text">What academic resources are available specifically for student-athletes — tutoring, study hall, advisors?</p>
+        <p class="question-why">Shows you take academics seriously. Also important info — you need to know you'll be supported through the season grind.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">10</span>
+      <div>
+        <p class="question-text">How does the coaching staff handle it when academic schedules conflict with practice or travel?</p>
+        <p class="question-why">Real-world question every student-athlete faces. Good coaches have a clear answer.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">11</span>
+      <div>
+        <p class="question-text">Are players able to do internships or pursue career development while playing?</p>
+        <p class="question-why">Especially relevant if you're interested in Sports Management or Business — the degree needs to work for your future.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#888;">🏠 About Campus Life</h3>
+  <div class="question-list">
+    <div class="question-item">
+      <span class="question-num">12</span>
+      <div>
+        <p class="question-text">Where do most athletes live — on campus or off? And what is housing like for freshmen?</p>
+        <p class="question-why">Allen has residence halls (Williams Residence Halls). Know what you're walking into logistically.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">13</span>
+      <div>
+        <p class="question-text">What's the culture like on the team — how do the players bond and support each other?</p>
+        <p class="question-why">Culture eats talent. You want teammates who push each other, not just tolerate each other.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">14</span>
+      <div>
+        <p class="question-text">Can I speak with a current player today about their experience here?</p>
+        <p class="question-why">The best intel comes from a current player speaking candidly — not the coach's sales pitch.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#888;">🔮 About Next Steps</h3>
+  <div class="question-list">
+    <div class="question-item">
+      <span class="question-num">15</span>
+      <div>
+        <p class="question-text">What does your recruiting timeline look like, and when do you need a decision?</p>
+        <p class="question-why">Understand the urgency. NCAA D-II scholarship offers can have deadlines. Don't let the offer expire by waiting too long.</p>
+      </div>
+    </div>
+    <div class="question-item">
+      <span class="question-num">16</span>
+      <div>
+        <p class="question-text">What do you need to see from me — in the workout today and going forward — before you can make a formal offer?</p>
+        <p class="question-why">Directly asks the coach to show his cards. If he's serious, he'll tell you exactly what the threshold is.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ SECTION 5 – WORKOUT PREP ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">05</span>
+    <div class="section-title-group">
+      <p class="section-label">Today's Workout</p>
+      <h2 class="section-title">How to Prepare &amp; Perform</h2>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:16px;">Before You Step on the Court</h3>
+      <div class="checklist">
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Hydrate on the drive down</p>
+            <p class="check-desc">Start drinking water now — not when you arrive. You want to be fully hydrated, not gulping water 20 minutes before tip.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Eat a light, quality meal 2–3 hours before</p>
+            <p class="check-desc">Avoid heavy or greasy food. Lean protein, complex carbs (rice, sweet potato, oatmeal), light on sugar.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Have your gear ready and organized</p>
+            <p class="check-desc">Clean basketball shoes (non-marking), shorts, practice jersey, socks, change of clothes, towel. Don't scramble when you arrive.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Arrive 15–20 minutes early</p>
+            <p class="check-desc">Introduce yourself to coaches calmly. Look around. Shake hands with players. This is part of the evaluation before the ball drops.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Warm up your body on your own time</p>
+            <p class="check-desc">Light jog, dynamic stretches, ball handling. Don't go into drills cold — do this before they officially start.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:16px;">During the Workout — Mindset</h3>
+      <div class="mindset-grid" style="display:flex; flex-direction:column; gap:16px;">
+        <div class="mindset-card mindset-do">
+          <h4>✅ DO</h4>
+          <ul>
+            <li>Compete hard on <em>every</em> rep, drill, and possession — even the boring ones</li>
+            <li>Talk on defense. Coaches love communicators.</li>
+            <li>Show your real skill set — don't try to be someone else</li>
+            <li>Sprint back on every play, especially when you make a mistake</li>
+            <li>Be coachable — respond immediately when a coach corrects you</li>
+            <li>Play with energy and joy — enjoy yourself</li>
+            <li>Introduce yourself to every player and coach by name</li>
+          </ul>
+        </div>
+        <div class="mindset-card mindset-dont">
+          <h4>🚫 DON'T</h4>
+          <ul>
+            <li>Ball hog or show off — play within the offense</li>
+            <li>Jog back on defense or take any play off</li>
+            <li>React negatively to being guarded hard or physical play</li>
+            <li>Be on your phone between drills</li>
+            <li>Argue calls or show frustration at teammates</li>
+            <li>Try to do too much — coaches want basketball IQ, not highlight reels</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="margin-top:30px;">
+    <h3>🎯 What Coaches Are Actually Watching</h3>
+    <ul>
+      <li><strong>Effort &amp; motor:</strong> Do you compete every single possession, drill, or sprint? This is the #1 thing evaluated in a workout. You cannot control your talent level that day; you can always control your effort.</li>
+      <li><strong>Coachability:</strong> When a coach gives you a correction, do you immediately adjust or push back? They want to coach you — show them you're teachable.</li>
+      <li><strong>Character off the ball:</strong> What do you do when you don't have the ball? Screens, cuts, positioning — these separate skilled players from team players.</li>
+      <li><strong>Body language:</strong> After a mistake, do you shake it off and get back into position or sulk? Mental toughness is evaluated every minute.</li>
+      <li><strong>Basketball IQ:</strong> Do you make the right pass? Do you understand spacing? Can you read the defense? Coach Whittler won 65% of his games at Morehouse — he coaches high-IQ basketball.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ SECTION 6 – DAY TIMELINE ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">06</span>
+    <div class="section-title-group">
+      <p class="section-label">Today's Game Plan</p>
+      <h2 class="section-title">Visit Day Timeline</h2>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">ON THE DRIVE</div>
+        <div class="timeline-desc">Read &amp; Review This Packet</div>
+        <div class="timeline-note">Know the school, the coach's background, the program's trajectory, and your questions cold.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">ARRIVAL</div>
+        <div class="timeline-desc">Campus Walk &amp; First Impressions</div>
+        <div class="timeline-note">Note what the campus feels like. Size. Energy. How students interact. Trust your gut.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">COACH MEETING</div>
+        <div class="timeline-desc">Sit-Down with Coach Whittler</div>
+        <div class="timeline-note">Come in confident. Make eye contact. Have your questions ready. This is a two-way interview.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">FACILITY TOUR</div>
+        <div class="timeline-desc">John Hurst Adams Gymnasium</div>
+        <div class="timeline-note">Note the weight room, locker room, practice space quality. Ask where players hang out on off-days.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">WORKOUT</div>
+        <div class="timeline-desc">Play with the Team</div>
+        <div class="timeline-note">This is your audition. Compete like you've done it a thousand times. Be yourself. Play your game.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">AFTER</div>
+        <div class="timeline-desc">Follow-Up Conversation</div>
+        <div class="timeline-note">Thank every coach and player by name. Ask about next steps. Exchange contact info.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">EVENING</div>
+        <div class="timeline-desc">Family Debrief</div>
+        <div class="timeline-note">Write down your thoughts — what felt right, what concerns came up. Send a thank-you text or email tonight.</div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:16px;">What to Bring</h3>
+      <div class="checklist">
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Basketball shoes (court-ready)</p>
+            <p class="check-desc">Non-marking soles, broken in — not brand new out of the box if possible.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Workout clothes + change of clothes</p>
+            <p class="check-desc">Look presentable for meetings. Dress casually but clean and put-together when not on the court.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Water bottle</p>
+            <p class="check-desc">Big one. Pre-filled.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Snacks for after the workout</p>
+            <p class="check-desc">Recovery nutrition within 30 min of finishing. Protein + carbs.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">Notepad or phone to record notes</p>
+            <p class="check-desc">After the coach meeting, jot down what was said about scholarship, next steps, and your role.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <div class="check-content">
+            <p class="check-title">High school transcripts / test scores (if requested)</p>
+            <p class="check-desc">Allen is test-optional. But have academic info ready if admissions comes up.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ SECTION 7 – KEY CONTACTS & NEXT STEPS ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">07</span>
+    <div class="section-title-group">
+      <p class="section-label">Follow Through</p>
+      <h2 class="section-title">Key Contacts &amp; Next Steps</h2>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">📞</div>
+      <div class="card-title">Coach Doug Whittler — Head Men's Basketball</div>
+      <div class="card-body">803-376-5807<br>Send a thank-you message tonight. Reference something specific from the conversation — not generic.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <div class="card-title">Terrell Polk — Recruiting Coordinator</div>
+      <div class="card-body">Associate Head Coach &amp; Recruiting Coordinator. This is your ongoing recruiting contact. Stay in communication consistently.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏛️</div>
+      <div class="card-title">Admissions Office</div>
+      <div class="card-body">futureyellowjacket.allenuniversity.edu<br>If the visit goes well, submit your application promptly. Allen is test-optional — no excuse to delay.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">💵</div>
+      <div class="card-title">Financial Aid Office</div>
+      <div class="card-body">allenuniversity.edu/applying-for-financial-aid<br>File your FAFSA if you haven't. Talk to the financial aid office separately from coaches to understand your full package.</div>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="margin-top:30px;">
+    <h3>📬 After the Visit — Your Action List</h3>
+    <ul>
+      <li><strong>Tonight:</strong> Send a thank-you text or email to Coach Whittler and the recruiting coordinator. Specific, genuine, short.</li>
+      <li><strong>Within 48 hours:</strong> Fill out the official recruiting questionnaire at Allen's ARMS portal (linked on the athletics website for Men's Basketball).</li>
+      <li><strong>This week:</strong> Have a family meeting to discuss the visit — pros, cons, financial picture, and how it compares to other options.</li>
+      <li><strong>FAFSA:</strong> If not already filed, file it immediately. Financial aid at Allen stacks favorably for the right candidate.</li>
+      <li><strong>Keep communicating:</strong> Coaches recruit guys who show consistent interest. A message every 1–2 weeks keeps you top of mind.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ FOOTER ══════════════════════════════════════ -->
+<div class="doc-footer">
+  <span>Allen University Official Visit Packet</span>
+  <span>March 27, 2026 • Columbia, SC • Go Yellow Jackets 🐝</span>
+</div>
+
+</body>
+</html>
