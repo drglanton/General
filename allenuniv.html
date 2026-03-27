@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,16 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --gold: #C9A84C;
-    --gold-light: #F0D98A;
-    --gold-pale: #FDF5DC;
+    --gold: #F5B800;
     --black: #0A0A0A;
-    --black-soft: #1A1A1A;
-    --white: #ffffff;
+    --white: #FAF9F6;
     --dark-gray: #1A1A1A;
-    --mid-gray: #3A3A3A;
-    --light-gray: #F7F4ED;
-    --accent: #C9A84C;
+    --mid-gray: #2E2E2E;
+    --light-gray: #F7F3E8;
+    --gold-light: #FFF8DC;
+    --accent: #E8A200;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,7 +39,6 @@
     padding: 60px;
     position: relative;
     overflow: hidden;
-    border: 8px solid var(--gold);
     page-break-after: always;
   }
 
@@ -50,7 +48,7 @@
     top: -80px; right: -80px;
     width: 500px; height: 500px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(245,184,0,0.18) 0%, transparent 70%);
   }
 
   .cover::after {
@@ -59,7 +57,7 @@
     bottom: -100px; left: -50px;
     width: 350px; height: 350px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(245,184,0,0.10) 0%, transparent 70%);
   }
 
   .cover-top {
@@ -109,14 +107,13 @@
     line-height: 0.95;
     letter-spacing: 2px;
     margin-bottom: 30px;
-    color: var(--white);
   }
 
   .cover-title span { color: var(--gold); }
 
   .cover-sub {
     font-size: 17px;
-    color: rgba(255,255,255,0.65);
+    color: rgba(255,255,255,0.7);
     max-width: 520px;
     font-weight: 300;
   }
@@ -127,7 +124,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     padding-top: 40px;
-    border-top: 1px solid rgba(201,168,76,0.3);
+    border-top: 1px solid rgba(255,255,255,0.15);
   }
 
   .cover-stat {
@@ -140,7 +137,7 @@
     font-size: 11px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.45);
+    color: rgba(255,255,255,0.4);
   }
 
   .cover-stat-value {
@@ -158,7 +155,7 @@
   }
 
   .section:nth-child(even) {
-    background: #FDFAF2;
+    background: var(--light-gray);
   }
 
   .section-header {
@@ -172,8 +169,7 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 80px;
     line-height: 1;
-    color: var(--gold-light);
-    opacity: 0.45;
+    color: rgba(0,0,0,0.06);
     margin-right: 4px;
   }
 
@@ -237,7 +233,7 @@
 
   .card-body {
     font-size: 13.5px;
-    color: #444;
+    color: #555;
     line-height: 1.6;
   }
 
@@ -274,7 +270,7 @@
 
   .question-why {
     font-size: 12.5px;
-    color: #666;
+    color: #888;
     font-style: italic;
   }
 
@@ -305,8 +301,8 @@
   }
 
   .check-content { flex: 1; }
-  .check-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; color: #1a1a1a; }
-  .check-desc { font-size: 12.5px; color: #555; }
+  .check-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  .check-desc { font-size: 12.5px; color: #777; }
 
   /* ── TWO-COL LAYOUT ── */
   .two-col {
@@ -322,7 +318,6 @@
     border-radius: 8px;
     padding: 32px;
     margin: 30px 0;
-    border: 1px solid rgba(201,168,76,0.25);
   }
 
   .highlight-box h3 {
@@ -335,7 +330,7 @@
 
   .highlight-box p, .highlight-box li {
     font-size: 14px;
-    color: rgba(255,255,255,0.82);
+    color: rgba(255,255,255,0.8);
     line-height: 1.7;
   }
 
@@ -354,7 +349,7 @@
     left: 12px;
     top: 0; bottom: 0;
     width: 2px;
-    background: linear-gradient(to bottom, var(--gold), rgba(201,168,76,0.15));
+    background: linear-gradient(to bottom, var(--gold), transparent);
   }
 
   .timeline-item {
@@ -391,7 +386,7 @@
 
   .timeline-note {
     font-size: 12.5px;
-    color: #555;
+    color: #888;
     font-style: italic;
   }
 
@@ -409,7 +404,6 @@
     background: var(--black);
     border-radius: 8px;
     color: var(--white);
-    border: 1px solid rgba(201,168,76,0.2);
   }
 
   .stat-box-num {
@@ -437,22 +431,16 @@
     border-bottom: 1px solid rgba(0,0,0,0.07);
   }
 
-  .info-table td:first-child {
-    font-weight: 600;
-    color: var(--gold);
-    width: 200px;
-  }
-
   .info-table td {
     padding: 12px 6px;
     font-size: 14px;
-    color: #2a2a2a;
   }
 
-  /* Dark panel info tables (inside black bg divs) */
-  .dark-panel .info-table td { color: rgba(255,255,255,0.8); }
-  .dark-panel .info-table td:first-child { color: var(--gold); }
-  .dark-panel .info-table tr { border-bottom: 1px solid rgba(201,168,76,0.15); }
+  .info-table td:first-child {
+    font-weight: 600;
+    color: #444;
+    width: 200px;
+  }
 
   /* ── MINDSET SECTION ── */
   .mindset-grid {
@@ -467,13 +455,13 @@
   }
 
   .mindset-do {
-    background: #0A0A0A;
-    border: 1px solid rgba(201,168,76,0.4);
+    background: #F0FFF4;
+    border: 1px solid #A3E4B4;
   }
 
   .mindset-dont {
-    background: #1A1010;
-    border: 1px solid rgba(180,60,60,0.35);
+    background: #FFF5F5;
+    border: 1px solid #FEC5C5;
   }
 
   .mindset-card h4 {
@@ -484,8 +472,8 @@
     margin-bottom: 14px;
   }
 
-  .mindset-do h4 { color: var(--gold); }
-  .mindset-dont h4 { color: #E07070; }
+  .mindset-do h4 { color: #1D7A3D; }
+  .mindset-dont h4 { color: #C0392B; }
 
   .mindset-card ul {
     padding-left: 18px;
@@ -499,10 +487,119 @@
     line-height: 1.5;
   }
 
-  .mindset-do li { color: rgba(255,255,255,0.8); }
-  .mindset-dont li { color: rgba(255,220,220,0.8); }
+  .mindset-do li { color: #1A5C30; }
+  .mindset-dont li { color: #922B21; }
 
-  /* ── PRINT ── */
+  /* ── LETTER PAGE ── */
+  .letter-page {
+    background: var(--black);
+    padding: 80px 60px;
+    page-break-inside: avoid;
+  }
+
+  .letter-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--white);
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    padding: 60px;
+    position: relative;
+  }
+
+  .letter-inner::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border: 1px solid rgba(245,184,0,0.25);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .letter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--gold);
+  }
+
+  .letter-from {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  .letter-date {
+    font-size: 13px;
+    color: #888;
+    font-style: italic;
+  }
+
+  .letter-salutation {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--black);
+    margin-bottom: 28px;
+  }
+
+  .letter-body p {
+    font-size: 15px;
+    line-height: 1.85;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  .letter-closing {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .letter-closing-text {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+
+  .letter-sig-area {
+    display: flex;
+    gap: 60px;
+  }
+
+  .letter-sig {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .letter-sig-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-style: italic;
+    color: var(--black);
+    font-weight: 700;
+  }
+
+  .letter-sig-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #999;
+  }
+
+  .letter-gold-rule {
+    width: 50px;
+    height: 3px;
+    background: var(--gold);
+    margin-bottom: 8px;
+  }
+
   @media print {
     .cover { min-height: 100vh; }
     .section { page-break-inside: avoid; }
@@ -519,7 +616,6 @@
     align-items: center;
     font-size: 12px;
     letter-spacing: 1px;
-    border-top: 2px solid var(--gold);
   }
 
   .doc-footer span:first-child { color: var(--gold); font-weight: 600; }
@@ -545,6 +641,7 @@
   <div class="cover-main">
     <p class="cover-eyebrow">Columbia, South Carolina</p>
     <h1 class="cover-title">Allen<br><span>Univer-<br>sity</span></h1>
+    <p class="cover-sub" style="margin-bottom:18px;">Prepared exclusively for <strong style="color:var(--gold); font-weight:700;">Thomas Glanton, III</strong></p>
     <p class="cover-sub">Everything you need for a successful college visit, scholarship conversation, and workout with the Yellow Jackets.</p>
   </div>
 
@@ -596,9 +693,9 @@
   <div class="two-col">
     <div>
       <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:14px;">History & Identity</h3>
-      <p style="font-size:14px; color:#2a2a2a; margin-bottom:12px;">Allen University was founded in 1870 as Payne Institute by ministers of the African Methodist Episcopal (AME) Church, with the original mission of educating freed slaves and newly emancipated African Americans. In 1880, it relocated to Columbia, SC and was renamed Allen University in honor of Bishop Richard Allen — the founder of the AME Church — making it <strong>the first university in South Carolina founded by African Americans for African Americans.</strong></p>
-      <p style="font-size:14px; color:#2a2a2a; margin-bottom:12px;">The campus itself is listed on the <strong>National Register of Historic Places</strong> as the Allen University Historic District. Chappelle Auditorium is historically significant — it was the site of the original meeting that set in motion <em>Brown v. Board of Education.</em></p>
-      <p style="font-size:14px; color:#2a2a2a;">Today Allen is a small, faith-grounded liberal arts institution with an estimated $30M+ annual economic impact on the Columbia community, and a strong legacy of producing educators, clergymen, and elected officials.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">Allen University was founded in 1870 as Payne Institute by ministers of the African Methodist Episcopal (AME) Church, with the original mission of educating freed slaves and newly emancipated African Americans. In 1880, it relocated to Columbia, SC and was renamed Allen University in honor of Bishop Richard Allen — the founder of the AME Church — making it <strong>the first university in South Carolina founded by African Americans for African Americans.</strong></p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">The campus itself is listed on the <strong>National Register of Historic Places</strong> as the Allen University Historic District. Chappelle Auditorium is historically significant — it was the site of the original meeting that set in motion <em>Brown v. Board of Education.</em></p>
+      <p style="font-size:14px; color:#444;">Today Allen is a small, faith-grounded liberal arts institution with an estimated $30M+ annual economic impact on the Columbia community, and a strong legacy of producing educators, clergymen, and elected officials.</p>
     </div>
 
     <div>
@@ -634,7 +731,7 @@
     </div>
   </div>
 
-  <p style="font-size:14px; color:#3a3a3a; max-width:700px; margin-bottom:30px;">Allen is a liberal arts school. Class sizes are small, professors are accessible, and the environment is built for students who need personalized support. Their popular majors are a good fit for a student-athlete aiming for a post-basketball career.</p>
+  <p style="font-size:14px; color:#555; max-width:700px; margin-bottom:30px;">Allen is a liberal arts school. Class sizes are small, professors are accessible, and the environment is built for students who need personalized support. Their popular majors are a good fit for a student-athlete aiming for a post-basketball career.</p>
 
   <div class="card-grid">
     <div class="card">
@@ -693,13 +790,13 @@
   <div class="two-col">
     <div>
       <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:16px;">Head Coach: Doug Whittler</h3>
-      <p style="font-size:14px; color:#2a2a2a; margin-bottom:12px;">Coach Whittler was hired in June 2025, arriving from Morehouse College where he spent four years as head coach and compiled a <strong>76-40 overall record (65.5% win rate)</strong> and <strong>59-21 in SIAC conference play (73.4%)</strong> — the highest win total for any Morehouse coach in their first four seasons.</p>
-      <p style="font-size:14px; color:#2a2a2a; margin-bottom:12px;">His Morehouse teams won <strong>three consecutive SIAC division titles</strong>. He was also selected as one of four head coaches nationally to serve as co-head coach in the 2025 HBCU All-Star Game.</p>
-      <p style="font-size:14px; color:#2a2a2a; margin-bottom:12px;">He was named interim head coach at Morehouse in 2021 following the passing of longtime coach Grady Brewer, then elevated to full head coach and immediately produced winning seasons.</p>
-      <p style="font-size:14px; color:#2a2a2a;"><strong>Bottom line:</strong> Coach Whittler is a proven, high-level SIAC coach who came to Allen to build something. This is a ground-floor opportunity at a program on the rise.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">Coach Whittler was hired in June 2025, arriving from Morehouse College where he spent four years as head coach and compiled a <strong>76-40 overall record (65.5% win rate)</strong> and <strong>59-21 in SIAC conference play (73.4%)</strong> — the highest win total for any Morehouse coach in their first four seasons.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">His Morehouse teams won <strong>three consecutive SIAC division titles</strong>. He was also selected as one of four head coaches nationally to serve as co-head coach in the 2025 HBCU All-Star Game.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">He was named interim head coach at Morehouse in 2021 following the passing of longtime coach Grady Brewer, then elevated to full head coach and immediately produced winning seasons.</p>
+      <p style="font-size:14px; color:#444;"><strong>Bottom line:</strong> Coach Whittler is a proven, high-level SIAC coach who came to Allen to build something. This is a ground-floor opportunity at a program on the rise.</p>
 
-      <div class="dark-panel" style="background:#111111; border-radius:6px; padding:16px; margin-top:20px; border:1px solid rgba(201,168,76,0.2);">
-        <p style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#C9A84C; margin-bottom:8px;">Coaching Staff</p>
+      <div style="background:#F5F5F5; border-radius:6px; padding:16px; margin-top:20px;">
+        <p style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#888; margin-bottom:8px;">Coaching Staff</p>
         <table class="info-table">
           <tr><td>Head Coach</td><td><strong>Doug Whittler</strong> — 803-376-5807</td></tr>
           <tr><td>Associate Head / Recruiting</td><td><strong>Terrell Polk</strong></td></tr>
@@ -711,12 +808,12 @@
 
     <div>
       <h3 style="font-family:'Playfair Display',serif; font-size:20px; margin-bottom:16px;">Program Status (2025–26)</h3>
-      <p style="font-size:14px; color:#2a2a2a; margin-bottom:12px;">The 2025–26 season is Coach Whittler's first at Allen. The team was <strong>predicted to finish last in the SIAC</strong> in the preseason — a motivating chip on the shoulder. Early in the season they were competitive in close games, showing strong character despite tight losses.</p>
-      <p style="font-size:14px; color:#2a2a2a; margin-bottom:12px;">A December 2025 game recap described the team as "on the cusp of turning the corner — competing toe-to-toe with SIAC opponents and proving they belong in every game." Key returning player <strong>Jacquez Shuler</strong> (junior forward) logged a double-double (13 pts, 10 reb, 5 ast) in a competitive loss.</p>
-      <p style="font-size:14px; color:#2a2a2a; margin-bottom:12px;">This is a <strong>rebuilding year with a high-caliber new coaching staff</strong> — exactly the kind of program where a skilled recruit can come in and earn immediate playing time and impact.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">The 2025–26 season is Coach Whittler's first at Allen. The team was <strong>predicted to finish last in the SIAC</strong> in the preseason — a motivating chip on the shoulder. Early in the season they were competitive in close games, showing strong character despite tight losses.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">A December 2025 game recap described the team as "on the cusp of turning the corner — competing toe-to-toe with SIAC opponents and proving they belong in every game." Key returning player <strong>Jacquez Shuler</strong> (junior forward) logged a double-double (13 pts, 10 reb, 5 ast) in a competitive loss.</p>
+      <p style="font-size:14px; color:#444; margin-bottom:12px;">This is a <strong>rebuilding year with a high-caliber new coaching staff</strong> — exactly the kind of program where a skilled recruit can come in and earn immediate playing time and impact.</p>
 
-      <div class="dark-panel" style="background:#111111; border-radius:6px; padding:16px; margin-top:20px; border:1px solid rgba(201,168,76,0.2);">
-        <p style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#C9A84C; margin-bottom:8px;">Program Info</p>
+      <div style="background:#F5F5F5; border-radius:6px; padding:16px; margin-top:20px;">
+        <p style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#888; margin-bottom:8px;">Program Info</p>
         <table class="info-table">
           <tr><td>Conference</td><td>SIAC (Eastern Division)</td></tr>
           <tr><td>Division</td><td>NCAA Division II</td></tr>
@@ -750,9 +847,9 @@
     </div>
   </div>
 
-  <p style="font-size:14px; color:#3a3a3a; max-width:700px; margin-bottom:30px;">Asking the right questions shows maturity, preparation, and genuine interest. Don't just sit back — coaches are evaluating how you think and carry yourself off the court as much as on it. Here are the most important questions, grouped by category.</p>
+  <p style="font-size:14px; color:#555; max-width:700px; margin-bottom:30px;">Asking the right questions shows maturity, preparation, and genuine interest. Don't just sit back — coaches are evaluating how you think and carry yourself off the court as much as on it. Here are the most important questions, grouped by category.</p>
 
-  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin-bottom:16px; color:#B8902E;">🏀 About the Program & Your Role</h3>
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin-bottom:16px; color:#888;">🏀 About the Program & Your Role</h3>
   <div class="question-list">
     <div class="question-item">
       <span class="question-num">01</span>
@@ -791,7 +888,7 @@
     </div>
   </div>
 
-  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#B8902E;">💰 About Scholarship & Finances</h3>
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#888;">💰 About Scholarship & Finances</h3>
   <div class="question-list">
     <div class="question-item">
       <span class="question-num">06</span>
@@ -816,7 +913,7 @@
     </div>
   </div>
 
-  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#B8902E;">📚 About Academic Support</h3>
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#888;">📚 About Academic Support</h3>
   <div class="question-list">
     <div class="question-item">
       <span class="question-num">09</span>
@@ -841,7 +938,7 @@
     </div>
   </div>
 
-  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#B8902E;">🏠 About Campus Life</h3>
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#888;">🏠 About Campus Life</h3>
   <div class="question-list">
     <div class="question-item">
       <span class="question-num">12</span>
@@ -866,7 +963,7 @@
     </div>
   </div>
 
-  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#B8902E;">🔮 About Next Steps</h3>
+  <h3 style="font-family:'Playfair Display',serif; font-size:18px; margin: 28px 0 16px; color:#888;">🔮 About Next Steps</h3>
   <div class="question-list">
     <div class="question-item">
       <span class="question-num">15</span>
@@ -1130,9 +1227,53 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════ FOOTER ══════════════════════════════════════ -->
+<!-- ══════════════════════════════════════ LETTER FROM MOM & DAD ══════════════════════════════════════ -->
+<div class="letter-page">
+  <div class="letter-inner">
+    <div class="letter-header">
+      <span class="letter-from">A Letter from Mom &amp; Dad</span>
+      <span class="letter-date">March 27, 2026</span>
+    </div>
+
+    <div class="letter-salutation">Dear Thomas,</div>
+
+    <div class="letter-body">
+      <p>Today is a big day — and we want you to know, before you ever set foot on that court, that we are already proud of you. Not because of what you might accomplish today, but because of who you already are and everything you've put in to get to this moment.</p>
+
+      <p>Think about it, Thomas. Most kids dream about getting a college scholarship opportunity. You're actually living it. That didn't happen by accident. That happened because of every early morning, every late practice, every time you pushed through when it would have been easier to quit. Every rep, every run, every sacrifice you've made — it all led to this drive down to Columbia today. Own that.</p>
+
+      <p>When you walk into John Hurst Adams Gymnasium, we want you to walk in with your head up and your chest out — not with arrogance, but with confidence. Confidence that is earned. You've worked for the right to be in that gym. Coach Whittler didn't invite just anybody — he invited <em>you</em>, Thomas Glanton, III. Don't ever forget that.</p>
+
+      <p>Play your game today. Not somebody else's game — yours. The game that we've watched you develop your whole life. Be a great teammate from the first whistle. Talk on defense. Compete on every single possession. And when things don't go perfectly — because they won't always — shake it off, get back in position, and keep going. That's what separates the players who make it from the ones who don't: the ability to keep going.</p>
+
+      <p>This is bigger than basketball, though. Allen University is a historic HBCU — a school built by Black Americans, for Black Americans, founded in 1870. If you put on that Gold and Black, you'll be part of something that matters far beyond wins and losses. You'll be representing a legacy. Carry that with pride.</p>
+
+      <p>Whatever happens today — whether you leave with an offer or leave with a lesson — you will come home to a family that loves you unconditionally and believes in your future completely. There is no outcome today that changes that. None.</p>
+
+      <p>But we know you, Thomas. We've watched you your whole life. And we believe today is going to be a great day. Go show them what the Glanton name stands for.</p>
+    </div>
+
+    <div class="letter-closing">
+      <p class="letter-closing-text">We love you more than words can say. Now go be great.</p>
+      <div class="letter-sig-area">
+        <div class="letter-sig">
+          <div class="letter-gold-rule"></div>
+          <span class="letter-sig-name">Mom</span>
+          <span class="letter-sig-label">Your Biggest Fan</span>
+        </div>
+        <div class="letter-sig">
+          <div class="letter-gold-rule"></div>
+          <span class="letter-sig-name">Dad</span>
+          <span class="letter-sig-label">In Your Corner Always</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="doc-footer">
-  <span>Allen University Official Visit Packet</span>
+  <span>Thomas Glanton, III — Allen University Visit Packet</span>
   <span>March 27, 2026 • Columbia, SC • Go Yellow Jackets 🐝</span>
 </div>
 
