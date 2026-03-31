@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thomas Glanton III — Weekly Budget</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4A017;
+    --gold-light: #F0C842;
+    --gold-dim: #8a6610;
+    --dark: #0D0D0D;
+    --dark-2: #161616;
+    --dark-3: #1F1F1F;
+    --dark-4: #2A2A2A;
+    --text: #EDEDED;
+    --text-muted: #7A7A7A;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212,160,23,0.12) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 48px 0 32px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .header-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 10vw, 80px);
+    letter-spacing: 0.04em;
+    line-height: 0.95;
+    color: var(--text);
+  }
+
+  .header h1 span {
+    color: var(--gold);
+  }
+
+  .header-sub {
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* Gold divider */
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 20px auto;
+  }
+
+  /* Income Input */
+  .income-card {
+    background: var(--dark-3);
+    border: 1px solid rgba(212,160,23,0.3);
+    border-radius: var(--radius);
+    padding: 28px 28px 24px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.1s both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .income-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .income-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .income-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dollar-sign {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .income-input {
+    flex: 1;
+    background: var(--dark-4);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 0.05em;
+    padding: 10px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    -moz-appearance: textfield;
+  }
+
+  .income-input::-webkit-outer-spin-button,
+  .income-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  .income-input::placeholder {
+    color: var(--dark-4);
+    filter: brightness(2.5);
+  }
+
+  .income-input:focus {
+    border-color: var(--gold);
+    background: rgba(212,160,23,0.05);
+  }
+
+  .income-hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* Budget Categories */
+  .section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    padding-left: 4px;
+  }
+
+  .categories {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .cat-card {
+    background: var(--dark-3);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cat-card:hover {
+    border-color: rgba(212,160,23,0.25);
+    background: var(--dark-4);
+    transform: translateX(3px);
+  }
+
+  .cat-card::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--cat-color, var(--gold));
+    border-radius: 2px 0 0 2px;
+    opacity: 0.7;
+  }
+
+  .cat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+
+  .cat-info {}
+
+  .cat-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .cat-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .cat-amount {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .cat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.05em;
+    color: var(--cat-color, var(--gold));
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: block;
+  }
+
+  .cat-value.pulse {
+    animation: valuePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .cat-sublabel {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* Progress bar inside card */
+  .cat-progress-wrap {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+  }
+
+  .cat-progress-track {
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .cat-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--cat-color, var(--gold));
+    width: 0%;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity: 0.65;
+  }
+
+  /* Summary */
+  .summary-card {
+    background: linear-gradient(135deg, rgba(212,160,23,0.12), rgba(212,160,23,0.04));
+    border: 1px solid rgba(212,160,23,0.4);
+    border-radius: var(--radius);
+    padding: 24px 24px 20px;
+    margin-top: 24px;
+    animation: fadeUp 0.6s ease 0.3s both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .summary-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .summary-item {}
+
+  .summary-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 4px;
+  }
+
+  .summary-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .summary-value.green { color: var(--green); }
+  .summary-value.gold { color: var(--gold-light); }
+
+  /* Motivation */
+  .motivation {
+    text-align: center;
+    padding: 28px 20px 0;
+    animation: fadeUp 0.6s ease 0.4s both;
+  }
+
+  .motivation p {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  .motivation strong {
+    color: var(--gold);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* Zero state */
+  .zero-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    opacity: 0.5;
+  }
+
+  .zero-arrow {
+    font-size: 24px;
+    animation: bounce 1.5s ease infinite;
+  }
+
+  .zero-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes valuePop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .cat-card {
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+    }
+    .summary-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-eyebrow">💰 Financial Discipline</div>
+    <h1>Weekly<br><span>Budget</span></h1>
+    <div class="divider"></div>
+    <p class="header-sub">Thomas Glanton III &nbsp;·&nbsp; Build wealth one week at a time</p>
+  </div>
+
+  <!-- Income Input -->
+  <div class="income-card">
+    <div class="income-label">Enter This Week's Pay</div>
+    <div class="income-row">
+      <div class="dollar-sign">$</div>
+      <input
+        type="number"
+        class="income-input"
+        id="incomeInput"
+        placeholder="0"
+        min="0"
+        step="0.01"
+        oninput="updateBudget()"
+        autofocus
+      />
+    </div>
+    <div class="income-hint" id="incomeHint">Type your paycheck amount above and watch your budget calculate instantly.</div>
+  </div>
+
+  <!-- Zero State -->
+  <div class="zero-hint" id="zeroHint">
+    <div class="zero-arrow">↑</div>
+    <div class="zero-text">Enter your income to see the breakdown</div>
+  </div>
+
+  <!-- Categories -->
+  <div id="budgetSection" style="display:none;">
+    <div class="section-title">Your Weekly Breakdown</div>
+    <div class="categories" id="categoriesContainer">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-card">
+      <div class="summary-title">Weekly Summary</div>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-label">Total Income</div>
+          <div class="summary-value gold" id="summaryIncome">$0</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Allocated</div>
+          <div class="summary-value" id="summaryAllocated">$0</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Going to Savings</div>
+          <div class="summary-value green" id="summarySavings">$0</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Growing Investments</div>
+          <div class="summary-value green" id="summaryInvest">$0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Motivation -->
+    <div class="motivation">
+      <p><strong>Stay consistent each week.</strong><br>
+      Small amounts grow into big results.<br>
+      Build strong habits now — your future self is counting on you.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const categories = [
+    { id: 'personal',  label: 'Personal Spending', pct: 0.50, icon: '🛍️', color: '#5B9BD5', sublabel: 'Food, clothes, entertainment' },
+    { id: 'insurance', label: 'Car Insurance',      pct: 0.20, icon: '🚗', color: '#E8A838', sublabel: 'Keep your coverage active' },
+    { id: 'gas',       label: 'Gas',                pct: 0.10, icon: '⛽', color: '#E87038', sublabel: 'Fill up & stay moving' },
+    { id: 'savings',   label: 'Savings',            pct: 0.10, icon: '🏦', color: '#2ECC71', sublabel: 'Emergency & goals fund' },
+    { id: 'church',    label: 'Church Giving',      pct: 0.05, icon: '🙏', color: '#A78BFA', sublabel: 'Give back & stay grounded' },
+    { id: 'investing', label: 'Investing',          pct: 0.05, icon: '📈', color: '#34D399', sublabel: 'Wealth building for the future' },
+  ];
+
+  // Build category cards
+  const container = document.getElementById('categoriesContainer');
+  categories.forEach(cat => {
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.id = `card-${cat.id}`;
+    card.style.setProperty('--cat-color', cat.color);
+    card.innerHTML = `
+      <div class="cat-icon">${cat.icon}</div>
+      <div class="cat-info">
+        <div class="cat-name">${cat.label}</div>
+        <div class="cat-pct">${Math.round(cat.pct * 100)}% of income</div>
+      </div>
+      <div class="cat-amount">
+        <span class="cat-value" id="val-${cat.id}">$—</span>
+        <div class="cat-sublabel" id="sub-${cat.id}">${cat.sublabel}</div>
+      </div>
+      <div class="cat-progress-wrap">
+        <div class="cat-progress-track">
+          <div class="cat-progress-fill" id="bar-${cat.id}" style="width:${Math.round(cat.pct * 100)}%"></div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  function formatMoney(n) {
+    if (n === 0) return '$0';
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function updateBudget() {
+    const raw = parseFloat(document.getElementById('incomeInput').value);
+    const income = isNaN(raw) || raw < 0 ? 0 : raw;
+
+    const budgetSection = document.getElementById('budgetSection');
+    const zeroHint = document.getElementById('zeroHint');
+
+    if (income === 0) {
+      budgetSection.style.display = 'none';
+      zeroHint.style.display = 'flex';
+      document.getElementById('incomeHint').textContent = 'Type your paycheck amount above and watch your budget calculate instantly.';
+      return;
+    }
+
+    budgetSection.style.display = 'block';
+    zeroHint.style.display = 'none';
+
+    // Update hint
+    document.getElementById('incomeHint').textContent =
+      `Great! Here's how to make ${formatMoney(income)} work for you this week.`;
+
+    let totalSavings = 0, totalInvest = 0;
+
+    categories.forEach(cat => {
+      const amount = income * cat.pct;
+      const el = document.getElementById(`val-${cat.id}`);
+
+      // Animate the value change
+      el.classList.remove('pulse');
+      void el.offsetWidth; // reflow
+      el.classList.add('pulse');
+
+      el.textContent = formatMoney(amount);
+
+      if (cat.id === 'savings') totalSavings = amount;
+      if (cat.id === 'investing') totalInvest = amount;
+    });
+
+    // Summary
+    document.getElementById('summaryIncome').textContent = formatMoney(income);
+    document.getElementById('summaryAllocated').textContent = formatMoney(income);
+    document.getElementById('summarySavings').textContent = formatMoney(totalSavings);
+    document.getElementById('summaryInvest').textContent = formatMoney(totalInvest);
+  }
+</script>
+
+</body>
+</html>
