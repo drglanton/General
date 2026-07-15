@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDCO — SREB Lead Command Center</title>
+<style>
+  :root{
+    --navy:#0D2B6B;
+    --blue:#1565C0;
+    --green-dark:#1B5E20;
+    --green-mid:#2E7D32;
+    --gold:#F9A825;
+    --text-dark:#1A1A2E;
+    --bg:#F5F6F9;
+    --card:#FFFFFF;
+    --border:#E2E5EC;
+    --muted:#6B7280;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:Calibri,"Segoe UI",-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text-dark);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---- Top brand bar ---- */
+  .gradient-bar{ height:6px; background:linear-gradient(90deg, var(--gold) 0%, var(--blue) 50%, var(--green-dark) 100%); }
+  .topbar{
+    background:var(--navy);
+    color:#fff;
+    padding:22px 32px 18px;
+  }
+  .topbar .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:11px;
+    font-weight:700;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .topbar h1{
+    margin:0 0 4px;
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:-.01em;
+  }
+  .topbar .sub{
+    font-size:13px;
+    color:#C9D3EA;
+  }
+  .topbar .meta{
+    margin-top:14px;
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:12px;
+    color:#B7C4E3;
+  }
+  .topbar .meta span b{ color:#fff; }
+
+  /* ---- KPI row ---- */
+  .kpi-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    padding:20px 32px 0;
+  }
+  .kpi{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 18px;
+    position:relative;
+    overflow:hidden;
+  }
+  .kpi::before{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:3px;
+    background:var(--kpi-accent, var(--blue));
+  }
+  .kpi .num{ font-size:28px; font-weight:700; color:var(--navy); line-height:1; }
+  .kpi .lbl{ font-size:11.5px; color:var(--muted); margin-top:6px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+
+  /* ---- Tabs ---- */
+  .tabbar{
+    position:sticky; top:0; z-index:20;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    margin-top:22px;
+    padding:0 32px;
+    display:flex;
+    gap:2px;
+    overflow-x:auto;
+  }
+  .tab{
+    padding:14px 16px;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--muted);
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+    white-space:nowrap;
+    user-select:none;
+  }
+  .tab:hover{ color:var(--navy); }
+  .tab.active{ color:var(--navy); border-bottom-color:var(--gold); }
+  .tab .count{
+    display:inline-block;
+    margin-left:6px;
+    background:var(--bg);
+    color:var(--navy);
+    border-radius:20px;
+    padding:1px 8px;
+    font-size:11px;
+    font-weight:700;
+  }
+  .tab.active .count{ background:var(--navy); color:#fff; }
+
+  /* ---- Content area ---- */
+  .content{ padding:24px 32px 60px; max-width:1400px; }
+  .panel{ display:none; animation:fadein .15s ease; }
+  .panel.active{ display:block; }
+  @keyframes fadein{ from{opacity:0;} to{opacity:1;} }
+
+  .section-title{
+    font-size:16px;
+    font-weight:700;
+    color:var(--navy);
+    margin:26px 0 12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .section-title:first-child{ margin-top:0; }
+  .section-title .bar{ width:4px; height:16px; background:var(--gold); border-radius:2px; }
+
+  /* ---- Cards grid for By Day / By Position ---- */
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:8px;
+  }
+  .stat-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 18px;
+    cursor:pointer;
+    transition:box-shadow .15s, transform .15s;
+  }
+  .stat-card:hover{ box-shadow:0 4px 14px rgba(13,43,107,0.12); transform:translateY(-1px); }
+  .stat-card .title{ font-size:13px; font-weight:700; color:var(--text-dark); margin-bottom:2px; }
+  .stat-card .desc{ font-size:11.5px; color:var(--muted); margin-bottom:10px; }
+  .stat-card .big{ font-size:24px; font-weight:700; color:var(--navy); }
+  .stat-card .foot{ font-size:11px; color:var(--muted); margin-top:2px; }
+
+  /* ---- Toolbar (search/filter) ---- */
+  .toolbar{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    margin-bottom:14px;
+  }
+  .search-box{
+    flex:1; min-width:220px;
+    position:relative;
+  }
+  .search-box input{
+    width:100%;
+    padding:10px 14px 10px 34px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:13.5px;
+    font-family:inherit;
+    background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="%236B7280" stroke-width="2"><circle cx="6.5" cy="6.5" r="5.5"/><line x1="10.5" y1="10.5" x2="15" y2="15"/></svg>') no-repeat 10px center;
+  }
+  .search-box input:focus{ outline:2px solid var(--blue); outline-offset:1px; }
+  select, .pill-btn{
+    padding:9px 12px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:13px;
+    font-family:inherit;
+    background:#fff;
+    color:var(--text-dark);
+    cursor:pointer;
+  }
+  select:focus, .pill-btn:focus{ outline:2px solid var(--blue); outline-offset:1px; }
+  .pill-btn.active{ background:var(--navy); color:#fff; border-color:var(--navy); }
+  .result-count{ font-size:12.5px; color:var(--muted); margin-left:auto; white-space:nowrap; }
+
+  /* ---- Table ---- */
+  .table-wrap{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  thead th{
+    text-align:left;
+    background:var(--navy);
+    color:#fff;
+    padding:11px 14px;
+    font-weight:600;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    cursor:pointer;
+    user-select:none;
+    white-space:nowrap;
+  }
+  thead th:hover{ background:#123a8f; }
+  thead th .arrow{ opacity:.5; font-size:10px; margin-left:4px; }
+  tbody tr{ border-bottom:1px solid var(--border); }
+  tbody tr:last-child{ border-bottom:none; }
+  tbody tr:nth-child(even){ background:#FAFBFC; }
+  tbody tr:hover{ background:#F0F4FB; }
+  tbody td{ padding:10px 14px; vertical-align:middle; }
+  .name-cell{ font-weight:600; color:var(--text-dark); }
+  .email-cell, .phone-cell{ color:var(--muted); font-size:12.5px; }
+  .empty-row td{ padding:32px; text-align:center; color:var(--muted); font-size:13px; }
+
+  /* ---- Pills ---- */
+  .pill{
+    display:inline-block;
+    padding:3px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .pill-form{ background:#E3ECFB; color:var(--blue); }
+  .pill-chaos{ background:#FDF0DA; color:#B8860B; }
+  .pill-gameplan{ background:#E1EFE2; color:var(--green-dark); }
+  .pill-books{ background:#FDF0DA; color:#B8860B; }
+  .pill-engage{ background:#E1EFE2; color:var(--green-dark); }
+  .pill-both{ background:linear-gradient(90deg,#FDF0DA,#E1EFE2); color:var(--navy); }
+  .pill-none{ background:#EEF0F3; color:var(--muted); }
+  .pill-purchased{ background:var(--gold); color:#5A3D00; }
+  .role-badge{
+    font-size:12px; color:var(--text-dark); font-weight:600;
+  }
+
+  .subnote{
+    font-size:12px; color:var(--muted); margin:6px 0 16px; line-height:1.5;
+  }
+  .flag-box{
+    background:#FDEDEC; border:1px solid #F3C5C0; border-radius:8px;
+    padding:12px 16px; font-size:12.5px; color:#8B2E24; margin-bottom:18px;
+  }
+  .flag-box b{ color:#6E1E17; }
+
+  footer{
+    padding:20px 32px 40px;
+    font-size:11.5px;
+    color:var(--muted);
+    border-top:1px solid var(--border);
+    margin-top:20px;
+  }
+
+  @media (max-width:640px){
+    .topbar, .tabbar, .content{ padding-left:16px; padding-right:16px; }
+    .kpi-row{ padding-left:16px; padding-right:16px; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="gradient-bar"></div>
+<div class="topbar">
+  <div class="eyebrow">The Education Company</div>
+  <h1>SREB Making Schools Work 2026 — Lead Command Center</h1>
+  <div class="sub">Nashville · Gaylord Opryland · Live conference lead tracker for Megan</div>
+  <div class="meta">
+    <span>Sessions tracked: <b>2 of 4</b></span>
+    <span>Last data pull: <b id="lastPull">—</b></span>
+    <span>Total unique contacts: <b id="metaTotal">—</b></span>
+  </div>
+</div>
+
+<div class="kpi-row" id="kpiRow"></div>
+
+<div class="tabbar" id="tabbar">
+  <div class="tab active" data-tab="overview">Overview</div>
+  <div class="tab" data-tab="byday">By Day / Session</div>
+  <div class="tab" data-tab="byposition">By Position</div>
+  <div class="tab" data-tab="books">Wants Books &amp; Materials</div>
+  <div class="tab" data-tab="engage">Wants School Visit</div>
+  <div class="tab" data-tab="sms">SMS-Only Leads</div>
+  <div class="tab" data-tab="all">All Contacts</div>
+</div>
+
+<div class="content">
+
+  <!-- OVERVIEW -->
+  <div class="panel active" id="panel-overview">
+    <div class="section-title"><span class="bar"></span>How to use this with Nutshell</div>
+    <div class="subnote">
+      Every row in every tab shows name, email, and phone where we have it. Search Nutshell by email (form leads) or phone (SMS-only leads) to pull up the matching record. Contacts with no name yet are SMS keyword texters who haven't replied with their info — they're phone-only in Nutshell too.
+    </div>
+
+    <div class="section-title"><span class="bar"></span>Channel split</div>
+    <div class="card-grid" id="channelCards"></div>
+
+    <div class="section-title"><span class="bar"></span>Interest split (form leads only)</div>
+    <div class="card-grid" id="interestCards"></div>
+  </div>
+
+  <!-- BY DAY -->
+  <div class="panel" id="panel-byday">
+    <div id="byDayContent"></div>
+  </div>
+
+  <!-- BY POSITION -->
+  <div class="panel" id="panel-byposition">
+    <div class="section-title"><span class="bar"></span>Leads by role</div>
+    <div class="card-grid" id="positionCards"></div>
+    <div class="section-title"><span class="bar"></span>Filtered list</div>
+    <div class="toolbar">
+      <div class="search-box"><input type="text" id="posSearch" placeholder="Search name, email, phone..."></div>
+      <select id="posRoleFilter"></select>
+      <span class="result-count" id="posCount"></span>
+    </div>
+    <div class="table-wrap"><table id="posTable"><thead></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- BOOKS -->
+  <div class="panel" id="panel-books">
+    <div class="section-title"><span class="bar"></span>Wants Books &amp; Materials</div>
+    <div class="subnote">Anyone who checked "Send me more information about ordering books and materials" on a handout form.</div>
+    <div class="toolbar">
+      <div class="search-box"><input type="text" id="booksSearch" placeholder="Search name, email, phone..."></div>
+      <select id="booksDayFilter"></select>
+      <span class="result-count" id="booksCount"></span>
+    </div>
+    <div class="table-wrap"><table id="booksTable"><thead></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- ENGAGE -->
+  <div class="panel" id="panel-engage">
+    <div class="section-title"><span class="bar"></span>Wants EDCO to come to their school</div>
+    <div class="subnote">Anyone who checked "Send me more information about bringing EDCO to my school" on a handout form. These are the hottest leads for the outbound caller / booking flow.</div>
+    <div class="toolbar">
+      <div class="search-box"><input type="text" id="engageSearch" placeholder="Search name, email, phone..."></div>
+      <select id="engageDayFilter"></select>
+      <span class="result-count" id="engageCount"></span>
+    </div>
+    <div class="table-wrap"><table id="engageTable"><thead></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- SMS ONLY -->
+  <div class="panel" id="panel-sms">
+    <div class="section-title"><span class="bar"></span>SMS keyword leads — no form submitted yet</div>
+    <div class="flag-box"><b>Phone only, no name or email on file.</b> These texted a session keyword (CHAOS or GAMEPLAN) but haven't filled out a form or replied with their email. Not yet actionable in Nutshell by name — track by phone number until the nurture sequence captures more info.</div>
+    <div class="toolbar">
+      <div class="search-box"><input type="text" id="smsSearch" placeholder="Search phone..."></div>
+      <select id="smsChannelFilter"></select>
+      <span class="result-count" id="smsCount"></span>
+    </div>
+    <div class="table-wrap"><table id="smsTable"><thead></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- ALL -->
+  <div class="panel" id="panel-all">
+    <div class="section-title"><span class="bar"></span>Every contact captured so far</div>
+    <div class="toolbar">
+      <div class="search-box"><input type="text" id="allSearch" placeholder="Search name, email, phone..."></div>
+      <select id="allDayFilter"></select>
+      <select id="allChannelFilter"></select>
+      <select id="allRoleFilter"></select>
+      <span class="result-count" id="allCount"></span>
+    </div>
+    <div class="table-wrap"><table id="allTable"><thead></thead><tbody></tbody></table></div>
+  </div>
+
+</div>
+
+<footer>
+  The Education Company &nbsp;|&nbsp; 5916 East Lake Pkwy PMB 103, McDonough GA 30252 &nbsp;|&nbsp; 800-294-9009 &nbsp;|&nbsp; Data pulled from GHL contact exports. Update this file by regenerating from the latest export.
+</footer>
+
+<script>
+const DATA = [{"id": "qyIszbx7ACqCLEZTD4ri", "first": "Scott", "last": "Strainge", "name": "Scott Strainge", "phone": "", "email": "sstrainge@gmail.com", "created": "Jul 15, 2026 02:16 PM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "axLrLj2kROexp6eAueHT", "first": "Lacy", "last": "Wallace", "name": "Lacy Wallace", "phone": "", "email": "lacy.wallace.1@gmail.com", "created": "Jul 15, 2026 11:40 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "T0NQHczSNB6Zk6d05N4J", "first": "Michael", "last": "Bellamy", "name": "Michael Bellamy", "phone": "", "email": "michael.bellamy@nn.k12.va.us", "created": "Jul 15, 2026 11:16 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-assistant-principal", "msw-2026"]}, {"id": "kkEsmdupxWjwsoGKJx5I", "first": "Jermaine", "last": "White", "name": "Jermaine White", "phone": "", "email": "jermaine.white@sumterschools.net", "created": "Jul 15, 2026 11:07 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-assistant-principal", "msw-2026"]}, {"id": "Q6eZdc2Y3nhx0FnXcu3y", "first": "Christine", "last": "Paige", "name": "Christine Paige", "phone": "", "email": "mspaigephs@gmail.com", "created": "Jul 15, 2026 11:07 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "eR6Gpj2Eu1tpi3Bsfxey", "first": "Samantha", "last": "Anderson", "name": "Samantha Anderson", "phone": "", "email": "samrb2007@yahoo.com", "created": "Jul 15, 2026 11:06 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "QQd5t5TQJENPS4VmB8ke", "first": "Rachel", "last": "Bernhard", "name": "Rachel Bernhard", "phone": "", "email": "rbernhard@pentacareercenter.org", "created": "Jul 15, 2026 11:04 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role-assistant-principal", "msw-2026"]}, {"id": "PdfsztY6xE1aQpG7xWBc", "first": "Denise", "last": "Lawton", "name": "Denise Lawton", "phone": "", "email": "sdeniselawton@gmail.com", "created": "Jul 15, 2026 11:03 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "nD1LmDOFRDBW7nTRn32u", "first": "Kathleen", "last": "Gentry", "name": "Kathleen Gentry", "phone": "", "email": "gentryk1@charlottesvilleschools.org", "created": "Jul 15, 2026 11:03 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-assistant-principal", "msw-2026"]}, {"id": "7nX2xUSeopO1wFWiPUrK", "first": "Gwen", "last": "Misteller", "name": "Gwen Misteller", "phone": "", "email": "gmosteller@dcts.org", "created": "Jul 15, 2026 11:03 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-assistant-principal", "msw-2026"]}, {"id": "y8bIZslluSncMAHM1ZJ9", "first": "Selma", "last": "Riddick", "name": "Selma Riddick", "phone": "", "email": "selmariddick54@gmail.com", "created": "Jul 15, 2026 11:03 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "RPbPwc3xLuaIOEexwta7", "first": "Beverly", "last": "Cumbo", "name": "Beverly Cumbo", "phone": "", "email": "bcumbo@nps.k12.va.us", "created": "Jul 15, 2026 11:03 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Other", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role-other", "edco_setter_assigned", "msw-2026"]}, {"id": "tTdYDDZSiFvJMeizNelf", "first": "Gerri", "last": "Burns", "name": "Gerri Burns", "phone": "", "email": "gburns@spotsylvania.k12.va.us", "created": "Jul 15, 2026 11:03 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "10HqJ7PtenZDcLXjwJM9", "first": "Alisha", "last": "Seymour", "name": "Alisha Seymour", "phone": "", "email": "aseymour@richland2.org", "created": "Jul 15, 2026 11:03 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "rLQery2Wd2gIilZGyxbW", "first": "Bobby", "last": "Godwin", "name": "Bobby Godwin", "phone": "", "email": "bdgodwin@bladen.k12.nc.us", "created": "Jul 15, 2026 11:03 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "QLP1YyzpbcUTByCus5Ax", "first": "Angela", "last": "Burfoot", "name": "Angela Burfoot", "phone": "", "email": "acburfoot@gmail.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "6H3GPDsRQtIWaL3biWDR", "first": "Harriet", "last": "Butts", "name": "Harriet Butts", "phone": "", "email": "hmj.butts@gmail.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Other", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role-other", "edco_setter_assigned", "msw-2026"]}, {"id": "880JxAFefqKXX82Gii3T", "first": "Michael", "last": "Mckenzie", "name": "Michael Mckenzie", "phone": "", "email": "mimckenzie@petersburg.k12.va.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Other", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-other", "edco_setter_assigned", "msw-2026"]}, {"id": "1jYznE1wrH6UV62csQj0", "first": "Marie", "last": "Hall", "name": "Marie Hall", "phone": "", "email": "mhall1@nps.k12.va.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-assistant-principal", "msw-2026"]}, {"id": "Pjf5RiPCiOCemt6RLMyS", "first": "Sidoline", "last": "Nangah abongwa", "name": "Sidoline Nangah abongwa", "phone": "", "email": "snangah@richland2.org", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "jTR1MzF0aPW3ZZVTkE98", "first": "Lusa", "last": "Long", "name": "Lusa Long", "phone": "", "email": "llong@jefcoed.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "role-assistant-principal", "msw-2026"]}, {"id": "L2nekb91WyLVIF7zPtve", "first": "Ashley", "last": "Artis", "name": "Ashley Artis", "phone": "", "email": "ashley.artis@hcs.k12.nc.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "Ix9zV1cL3ETrpLAkp0d7", "first": "Michelle", "last": "Middleton", "name": "Michelle Middleton", "phone": "", "email": "mwmiddle@nps.k12.va.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "FYVdQGmjnXoeUbhJNU8U", "first": "Avery", "last": "Anderson", "name": "Avery Anderson", "phone": "", "email": "averykate13@gmail.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "eB4reHozpfpfedwFjM1h", "first": "Audeliz", "last": "Hughes", "name": "Audeliz Hughes", "phone": "", "email": "audeliz.hughes@mps.k12.al.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "uXeIp8lbihBlWO4hdxST", "first": "Diamoneka", "last": "Heyward", "name": "Diamoneka Heyward", "phone": "", "email": "diamonekaheyward@anderson5.net", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-assistant-principal", "msw-2026"]}, {"id": "j3Baik2XKdB7ki5xmGN4", "first": "Trisha", "last": "Parker", "name": "Trisha Parker", "phone": "", "email": "tparker@wynnewood.k12.ok.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Unknown", "books": true, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "unknown_role_school", "msw-2026"]}, {"id": "eX37nCSYDpMyEi92QhfR", "first": "Allison", "last": "Martin", "name": "Allison Martin", "phone": "", "email": "amartin@wynnewood.k12.ok.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "1gfx6YzOZFBbiTY8OSf8", "first": "Cindy", "last": "Collier", "name": "Cindy Collier", "phone": "", "email": "ccollier@wynnewood.k12.ok.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "pzWmNd9qrCeqotpSWWzJ", "first": "Lacy", "last": "Wallace", "name": "Lacy Wallace", "phone": "", "email": "lewallace@jefcoed.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "SdB1C2woXmnPgjuaTND4", "first": "Carlisa", "last": "Ransom", "name": "Carlisa Ransom", "phone": "", "email": "carlisa.ransom1@nn.k12.va.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Other", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-other", "msw-2026"]}, {"id": "RB8MznGzp10BSB3kSs8r", "first": "Felisha", "last": "Brown", "name": "Felisha Brown", "phone": "", "email": "brown.felisha.c@muscogee.k12.ga.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "kqOnBjQSiGJkHMJHXOzc", "first": "Holly", "last": "Mcdonald", "name": "Holly Mcdonald", "phone": "", "email": "holly.mcdonald@butlerco.k12.al.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "KY9k7KH01Nk42Tmtf0Ff", "first": "Tiffany", "last": "Reeves", "name": "Tiffany Reeves", "phone": "", "email": "tareeves@greenvilleschools.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "Y4EMAOt1HN2zZP0nIFNT", "first": "Harshada", "last": "Deshmukh", "name": "Harshada Deshmukh", "phone": "", "email": "harshada.deshmukh@mps.k12.al.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "CA4hs3kfww77nfTKygyk", "first": "Tabitha", "last": "Bradshaw", "name": "Tabitha Bradshaw", "phone": "", "email": "tabitha.bradshaw@mps.k12.al.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "PPF53ItWIJedwvpTCwkD", "first": "Kortni", "last": "Canada", "name": "Kortni Canada", "phone": "", "email": "canadak@nlcs.k12.in.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "w1lDhvSs45bx1vjtRo9W", "first": "Quita", "last": "Hayes", "name": "Quita Hayes", "phone": "", "email": "quita.thomashayes@hcs.k12.nc.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "BVPUeS4LqRm01Dm2EFpB", "first": "Amy", "last": "Milne", "name": "Amy Milne", "phone": "", "email": "milne4life@aol.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "hGesKfwf4LXVXhseHWac", "first": "Nastaja", "last": "Tyler", "name": "Nastaja Tyler", "phone": "", "email": "nastaja.tyler@paisd.org", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "rmNiu9MkbqygH9fQW9DM", "first": "Carrie", "last": "Miller", "name": "Carrie Miller", "phone": "", "email": "carrie.miller@careertech.ok.gov", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Unknown", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "unknown_role_school", "edco_setter_assigned", "msw-2026"]}, {"id": "SQEJL4FgwE6kyXHbssmO", "first": "Amber", "last": "Mcneal", "name": "Amber Mcneal", "phone": "+14094332400", "email": "amber.mcneal@paisd.org", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Unknown", "books": true, "engage": true, "purchased": true, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "unknown_role_school", "edco_setter_assigned", "msw-2026", "keyword_chaos", "digital-product-delivered"]}, {"id": "VQ6NY5sNO2lyqFvyJ0co", "first": "Stephanie", "last": "Johnson", "name": "Stephanie Johnson", "phone": "", "email": "stjohns6670@yahoo.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Other", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role-other", "origin_general", "ai opt-in", "edco_setter_assigned", "msw-2026"]}, {"id": "B5aVraWxZM9DEP5Kf26w", "first": "Paula", "last": "Desrochers", "name": "Paula Desrochers", "phone": "", "email": "deardesrochers@gmail.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "wZUCPThev8Yr2S6Lo1vz", "first": "Samantha", "last": "Anderson", "name": "Samantha Anderson", "phone": "", "email": "samrb1930@gmail.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "iRLR7Mvbo0X6QWZ3RnfW", "first": "Kathy", "last": "Skinner", "name": "Kathy Skinner", "phone": "", "email": "kskinner@jefcoed.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "unknown_role_school", "msw-2026"]}, {"id": "Wk8kALTElpBih9qyyBDe", "first": "Dustin", "last": "Robinson", "name": "Dustin Robinson", "phone": "", "email": "dustin.robinson16@yahoo.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role-assistant-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "d1Wxgv8eJjVJKaJ9pfra", "first": "Amber", "last": "Fitz", "name": "Amber Fitz", "phone": "", "email": "amber.fitz@cpschools.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "HP0D9xnCs1cbR5lEsKTr", "first": "Michelle", "last": "Durant", "name": "Michelle Durant", "phone": "", "email": "michelle.durant@coschools.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "Cf3pzw1llxpCtON5JAHz", "first": "Janiya", "last": "Gresham", "name": "Janiya Gresham", "phone": "", "email": "jgresham@jefcoed.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Unknown", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "unknown_role_school", "edco_setter_assigned", "msw-2026"]}, {"id": "Zqoqa7MLiWp2FEDsKc3B", "first": "Keila", "last": "Emenhiser", "name": "Keila Emenhiser", "phone": "", "email": "emenhiserk@fmsdmail.org", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "tIC6SYSsLDI92yowOgWs", "first": "Temi", "last": "Lawal", "name": "Temi Lawal", "phone": "", "email": "temi.o.lawal@gmail.com", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "oWSNpqQe4LO7ePPIJv1T", "first": "Gregg", "last": "Taylor", "name": "Gregg Taylor", "phone": "", "email": "taylorg@nlcs.k12.in.us", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "KMILYkEwWoF569Fguv0F", "first": "Tamara", "last": "Edwards", "name": "Tamara Edwards", "phone": "", "email": "tedwards@atoka.org", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Unknown", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "unknown_role_school", "edco_setter_assigned", "msw-2026"]}, {"id": "5dU4M4UL4pKEelTPbiIZ", "first": "Macy", "last": "Shoulders", "name": "Macy Shoulders", "phone": "", "email": "macy.shoulders@sandites.org", "created": "Jul 15, 2026 11:02 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "iJfsVDxHl6OyrMMUcNfW", "first": "Christine", "last": "White", "name": "Christine White", "phone": "", "email": "cwhite@perrycountyal.org", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Other", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-other", "edco_setter_assigned", "msw-2026"]}, {"id": "aCixXNihMgfem8FokDpd", "first": "Kristin", "last": "Hulett", "name": "Kristin Hulett", "phone": "", "email": "kristinmichellethomas@gmail.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Other", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-other", "msw-2026"]}, {"id": "m0l4CMZhK4FV2BhGYnGg", "first": "Bridget", "last": "Guenthner", "name": "Bridget Guenthner", "phone": "", "email": "bguenthner.seijaku.consulting@gmail.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Other", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-other", "msw-2026"]}, {"id": "2Wk8W0NyfJx5seLowSUt", "first": "Rachel", "last": "Routledge", "name": "Rachel Routledge", "phone": "", "email": "rachelroutledge@yahoo.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "13lA3ZYbrCRh2LeVobRy", "first": "Laura", "last": "Brooks", "name": "Laura Brooks", "phone": "", "email": "lrbrooks@spotsylvania.k12.va.us", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "3D0FXJeVNa6u7S0JJkeS", "first": "Kaylie", "last": "Clifton", "name": "Kaylie Clifton", "phone": "", "email": "kclifton@wynnewood.k12.ok.us", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "V3cpHqtVwbYMSZYMPPAh", "first": "Greta", "last": "Samwel", "name": "Greta Samwel", "phone": "", "email": "gsamwel@mcloudschools.us", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "xdQ0CyJOwuPIH2D7ibXC", "first": "Candyce", "last": "Treadway", "name": "Candyce Treadway", "phone": "", "email": "ctreadway@roaneschools.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "Cxo2Pn16PRpJOVv5Gy3Q", "first": "Samantha", "last": "Bell", "name": "Samantha Bell", "phone": "", "email": "bell.samantha.k@muscogee.k12.ga.us", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "interest-books-materials", "edco_webinar_passed", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "0KveLpqHBsMVIIcOTYQ2", "first": "Kandace", "last": "Cook", "name": "Kandace Cook", "phone": "", "email": "klynn0322@gmail.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "dOQABABeJgefZfToerOm", "first": "Alyssa", "last": "Popolizio", "name": "Alyssa Popolizio", "phone": "", "email": "apopolizio@scgreencharter.org", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "Mhj47mi0GVyIeW6x4DLf", "first": "Kat", "last": "Y", "name": "Kat Y", "phone": "", "email": "kathryn.patterson@stanlycountyschools.org", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Unknown", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "unknown_role_school", "edco_setter_assigned", "msw-2026"]}, {"id": "VE6nZD0WZAw7055tL5fm", "first": "Ash", "last": "Umphress", "name": "Ash Umphress", "phone": "", "email": "aumphress@jefcoed.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "pKHM7dzcwf1BfyL25OkC", "first": "Raven", "last": "Vawters", "name": "Raven Vawters", "phone": "", "email": "raven.finch26@gmail.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Other", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role-other", "edco_setter_assigned", "msw-2026"]}, {"id": "QYiFFGLsXCWhyWK7l7pF", "first": "Alexis", "last": "Lambert", "name": "Alexis Lambert", "phone": "", "email": "a.lambert0824@gmail.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Unknown", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "unknown_role_school", "edco_setter_assigned", "msw-2026"]}, {"id": "dK2xbFfoza1lwPcxQe22", "first": "Mark", "last": "Webb", "name": "Mark Webb", "phone": "", "email": "mwebb@ktc.edu", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "IKf7GetwcAQa1CQEF5qJ", "first": "Alexus", "last": "Ables", "name": "Alexus Ables", "phone": "", "email": "alexus.ables@mps.k12.al.us", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "AEj0xH3NKUqRnM6lY1Ml", "first": "Joellyn", "last": "Hayden", "name": "Joellyn Hayden", "phone": "", "email": "jhayden@andersonctc.org", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": false, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "hZhwbcK3MwuXHVaLB5do", "first": "Tasha", "last": "Thompson", "name": "Tasha Thompson", "phone": "", "email": "tthompson@vwsd.org", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Unknown", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "unknown_role_school", "edco_setter_assigned", "msw-2026"]}, {"id": "LImFGPMmW5EY4c5aMwdU", "first": "Cathy", "last": "Stinson", "name": "Cathy Stinson", "phone": "", "email": "cstinson@richland2.org", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": false, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "5E72okX2bp7o6EF8DML8", "first": "Clarissa", "last": "Deller", "name": "Clarissa Deller", "phone": "", "email": "clarissa.cochran00@gmail.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "YtkrjOgVyv9ctMv3tTRg", "first": "Ross", "last": "Liggett", "name": "Ross Liggett", "phone": "", "email": "rossliggett22@gmail.com", "created": "Jul 15, 2026 11:01 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "Form", "role": "Teacher", "books": true, "engage": true, "purchased": false, "teacherReferral": true, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role_teacher", "teacher-referral-program", "kit-delivered", "msw-2026"]}, {"id": "38eeeYSiTwJ6E30w7L4W", "first": "", "last": "", "name": "(No name captured)", "phone": "+14346658299", "email": "", "created": "Jul 15, 2026 10:51 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "CS8IMZgWD19yUdZKh1qg", "first": "", "last": "", "name": "(No name captured)", "phone": "+12055664146", "email": "", "created": "Jul 15, 2026 10:50 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "TkJXdA4qWVhxM1Jdbc5t", "first": "", "last": "", "name": "(No name captured)", "phone": "+18049947640", "email": "", "created": "Jul 15, 2026 10:50 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "GXtCSOOyKRAdtLsBq9Wf", "first": "", "last": "", "name": "(No name captured)", "phone": "+14052681811", "email": "", "created": "Jul 15, 2026 10:50 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "fSUcLu4wtx35KbbOmjtw", "first": "", "last": "", "name": "(No name captured)", "phone": "+17064242852", "email": "", "created": "Jul 15, 2026 10:50 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "dRcAfyAhcIYOENxfSbcB", "first": "", "last": "", "name": "(No name captured)", "phone": "+13344371804", "email": "", "created": "Jul 15, 2026 10:50 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "s6PR5MmP7oIolKMgg4Gt", "first": "", "last": "", "name": "(No name captured)", "phone": "+14192838517", "email": "", "created": "Jul 15, 2026 10:50 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "r59JUGt5XqDUUs5deauc", "first": "", "last": "", "name": "(No name captured)", "phone": "+12056025632", "email": "", "created": "Jul 15, 2026 10:50 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "d3Pf4Ua3U3dQIxUwps7f", "first": "", "last": "", "name": "(No name captured)", "phone": "+14052071270", "email": "", "created": "Jul 15, 2026 10:50 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "H5LtZCWxQVRinGJ9G9rR", "first": "", "last": "", "name": "(No name captured)", "phone": "+12528863090", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "6xeyfwaiSyRfM2CyJAfc", "first": "", "last": "", "name": "(No name captured)", "phone": "+17576817262", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "vnRoOZUw0pZX1dkDrrPA", "first": "", "last": "", "name": "(No name captured)", "phone": "+15809800094", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "yPhEhftQqi91HNDtdOE2", "first": "", "last": "", "name": "(No name captured)", "phone": "+15807599503", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "4BKDb5agx4PaRTcXz6vP", "first": "", "last": "", "name": "(No name captured)", "phone": "+17576351985", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "2oiduQdAiiPctVPLG6gi", "first": "", "last": "", "name": "(No name captured)", "phone": "+17577542607", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "ed3Bm1QODxjcdL3SjgRl", "first": "", "last": "", "name": "(No name captured)", "phone": "+17579437418", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "gfFQWgMhENhS19wei4cB", "first": "", "last": "", "name": "(No name captured)", "phone": "+18035651370", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "a7yWOF4brHwIprzzEitn", "first": "", "last": "", "name": "(No name captured)", "phone": "+12055630136", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "0me6hIvi7wiCQAYayvaz", "first": "", "last": "", "name": "(No name captured)", "phone": "+14058087523", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "P8wA5CvGNyskzgwWHkVh", "first": "", "last": "", "name": "(No name captured)", "phone": "+18034466785", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "UfLpj1xPrkHb6DN4yzqc", "first": "", "last": "", "name": "(No name captured)", "phone": "+14053062976", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "G4mFELwz3JQPEDJkT3E4", "first": "", "last": "", "name": "(No name captured)", "phone": "+18043347792", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "Dy61vHc3tIf9BDc2ULCO", "first": "", "last": "", "name": "(No name captured)", "phone": "+19788570410", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "enrYVBLl62pTTBUGSGGK", "first": "", "last": "", "name": "(No name captured)", "phone": "+18126751943", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "rBd6EZuYBkXbxLHttGSe", "first": "", "last": "", "name": "(No name captured)", "phone": "+14055143958", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "a20ieji7qO0wVWFjAeSf", "first": "", "last": "", "name": "(No name captured)", "phone": "+18035430259", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "w8pqBGqubXoszvQHMlj6", "first": "", "last": "", "name": "(No name captured)", "phone": "+17174189801", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "H4PEaWkGWJ7Bdd45pSxP", "first": "", "last": "", "name": "(No name captured)", "phone": "+16789108551", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "ENOJUdHtT9S0M3DZ30B5", "first": "", "last": "", "name": "(No name captured)", "phone": "+17065774284", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "DHnIh4lovGNtJ41z3ATQ", "first": "", "last": "", "name": "(No name captured)", "phone": "+13342310395", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "Pi2Tx9HEFs1J7C872aB2", "first": "", "last": "", "name": "(No name captured)", "phone": "+17577780493", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "SWs3b5DfsZPPMe8bEsWn", "first": "", "last": "", "name": "(No name captured)", "phone": "+12055168884", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "5ffAvx3vCUbeT8tW4mp5", "first": "", "last": "", "name": "(No name captured)", "phone": "+16097071070", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "GF2iA2ZFO1ziDxtylsB1", "first": "", "last": "", "name": "(No name captured)", "phone": "+19186942929", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "GHHV9nstSdlwCQne7Swv", "first": "", "last": "", "name": "(No name captured)", "phone": "+14054436249", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "2ZPXG25e8WvtA4EwE9Df", "first": "", "last": "", "name": "(No name captured)", "phone": "+14045383284", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "SVvbVuFMdWe2XcsCUpSm", "first": "", "last": "", "name": "(No name captured)", "phone": "+18039847286", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "FklTJ5CKcss77AG7DVen", "first": "", "last": "", "name": "(No name captured)", "phone": "+17572394875", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "240Waap4hR5JfXDOhCVu", "first": "", "last": "", "name": "(No name captured)", "phone": "+18642211670", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "ETIaFhWKi67oGxunl2Hn", "first": "", "last": "", "name": "(No name captured)", "phone": "+17577373834", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "5tC6uVja8147wSJuRNUk", "first": "", "last": "", "name": "(No name captured)", "phone": "+15408401259", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "bxXRhXNhr5cDmObpHOTP", "first": "", "last": "", "name": "(No name captured)", "phone": "+17575361772", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "JDRZ4JG0SByGDqLFaJDS", "first": "", "last": "", "name": "(No name captured)", "phone": "+19188454844", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "i4nQZq4RmjKz1qYXEWEj", "first": "", "last": "", "name": "(No name captured)", "phone": "+13362645991", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "aIoCJPNjQPii4eG1gDii", "first": "", "last": "", "name": "(No name captured)", "phone": "+12567096969", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "t4K1ZQVyI3usW1E9Kgw5", "first": "", "last": "", "name": "(No name captured)", "phone": "+19105789414", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "Nu1un3HU57Vl4TPoMIxU", "first": "", "last": "", "name": "(No name captured)", "phone": "+18636613736", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "n8dnyW9L8geZ4MJwp18e", "first": "", "last": "", "name": "(No name captured)", "phone": "+14233156315", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "kHsekZ7Grak7d6HToLp8", "first": "", "last": "", "name": "(No name captured)", "phone": "+14052682839", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "9MyyJYYtfgeNIjUeMPP6", "first": "", "last": "", "name": "(No name captured)", "phone": "+18125834538", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "C1ekaaMRrUGwd75E1hDv", "first": "", "last": "", "name": "(No name captured)", "phone": "+15802390783", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "xvtFchnxWfffuCuablMp", "first": "", "last": "", "name": "(No name captured)", "phone": "+17607808928", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "d9lAzlR2h9KMnPUIIBT8", "first": "", "last": "", "name": "(No name captured)", "phone": "+12085981926", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "UnlhakCyGFeA3zYaZPpX", "first": "", "last": "", "name": "(No name captured)", "phone": "+15805792428", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "bl6VNphWguURe4gTSONf", "first": "", "last": "", "name": "(No name captured)", "phone": "+14056409299", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "4XdKcCFUbseDTqhhjAf2", "first": "", "last": "", "name": "(No name captured)", "phone": "+15807280482", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "6dNOo57CzpD0Qv4FgApv", "first": "", "last": "", "name": "(No name captured)", "phone": "+18604714012", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "8ItJ10Ifv8PT4aYTRBhW", "first": "", "last": "", "name": "(No name captured)", "phone": "+13346490308", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "Yi5oC7Afg6jAom7CK85v", "first": "", "last": "", "name": "(No name captured)", "phone": "+12087571039", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "qzlsgLYTdQICWWqQhj2d", "first": "", "last": "", "name": "(No name captured)", "phone": "+17065879541", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "BS5GPREJ726c208b4iHf", "first": "", "last": "", "name": "(No name captured)", "phone": "+14053310680", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "QwDjLqNjTjFJBtyqd7Fi", "first": "", "last": "", "name": "(No name captured)", "phone": "+19103175987", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "d6lNZjigcmo0hBtzoeIf", "first": "", "last": "", "name": "(No name captured)", "phone": "+18038760351", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "K99I4c7bpoI5CZ86sYGj", "first": "", "last": "", "name": "(No name captured)", "phone": "+18046056839", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "niWzSgDDboK1nXLfSXci", "first": "", "last": "", "name": "(No name captured)", "phone": "+14048441320", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "YYvAp1QOQZpUYeYea6s4", "first": "", "last": "", "name": "(No name captured)", "phone": "+12054787775", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "ETw1v9W6yVcGKSnrDMqR", "first": "", "last": "", "name": "(No name captured)", "phone": "+16018318745", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "FczmBxunApOsjDzs929E", "first": "", "last": "", "name": "(No name captured)", "phone": "+12053704912", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "uyBJ1MyRaHyUFn6eeQx5", "first": "", "last": "", "name": "(No name captured)", "phone": "+12056096106", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "VFfu1IRLaYTB71ov3gHK", "first": "", "last": "", "name": "(No name captured)", "phone": "+16016305361", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "5sFVaBTXSBKg6bRuLonv", "first": "", "last": "", "name": "(No name captured)", "phone": "+18649337190", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "gZf7muGBgHuL2XeIQa5d", "first": "", "last": "", "name": "(No name captured)", "phone": "+18439953257", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "REEqrqulghXs4zFq8yS4", "first": "", "last": "", "name": "(No name captured)", "phone": "+16024485878", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "k5IR9FUQfLjg4GYDJucU", "first": "", "last": "", "name": "(No name captured)", "phone": "+17572187236", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "3sOdRBnUQ6FPC8wZdtuI", "first": "", "last": "", "name": "(No name captured)", "phone": "+17576349624", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "nNw2HZNnwRfSamRg61xG", "first": "", "last": "", "name": "(No name captured)", "phone": "+12052007271", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "bJ0qqtBeZ1vyaUqwwP5Q", "first": "", "last": "", "name": "(No name captured)", "phone": "+13047033785", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "TMlOHlf6e70enIU7Esel", "first": "", "last": "", "name": "(No name captured)", "phone": "+16614352197", "email": "", "created": "Jul 15, 2026 10:49 AM", "day": "2026-07-15", "dayLabel": "Day 2 \u2014 Wed Jul 15 (Control the Chaos)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_chaos", "msw-2026"]}, {"id": "ZilhmWD7Z6LhnsrIy8dH", "first": "Narquita", "last": "Snowden", "name": "Narquita Snowden", "phone": "", "email": "nsnowden931@nps.k12.va.us", "created": "Jul 14, 2026 05:26 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Other", "books": false, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-school-engagement", "role-other", "edco_setter_assigned", "msw-2026"]}, {"id": "syFqzEy4Gf3AreVVStAR", "first": "Kirbey", "last": "Sherbet", "name": "Kirbey Sherbet", "phone": "", "email": "ksherbet.ce@oxboe.com", "created": "Jul 14, 2026 05:26 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role-assistant-principal", "msw-2026"]}, {"id": "0RuKGRbMB9DytYIQ8HdF", "first": "Lorrie", "last": "Owens", "name": "Lorrie Owens", "phone": "", "email": "lowens.ceh@oxboe.com", "created": "Jul 14, 2026 05:26 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-principal", "msw-2026"]}, {"id": "pWisk9di8lqJMay7qweK", "first": "Monte", "last": "Johnson", "name": "Monte Johnson", "phone": "", "email": "montejohnson204407@gmail.com", "created": "Jul 14, 2026 05:26 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "f60ZS0X49aZdQEHMS9xv", "first": "Christina", "last": "Lott", "name": "Christina Lott", "phone": "", "email": "clott.de@oxboe.com", "created": "Jul 14, 2026 05:25 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-assistant-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "SvBbcjkN6H5KAOKvPBP0", "first": "Jordan", "last": "Patterson", "name": "Jordan Patterson", "phone": "", "email": "jpatterson.oe@oxboe.com", "created": "Jul 14, 2026 05:25 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-assistant-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "ZFy7JCJiMFFfE2lrIxD5", "first": "Matt", "last": "Brown", "name": "Matt Brown", "phone": "", "email": "mbrown@wcscc.edu", "created": "Jul 14, 2026 05:25 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Principal", "books": true, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role-principal", "msw-2026"]}, {"id": "2mHD7Imd8DSCMzr4cSGa", "first": "Bonnie", "last": "Smith", "name": "Bonnie Smith", "phone": "", "email": "smith.bonnie@ysd7.org", "created": "Jul 14, 2026 05:25 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Principal", "books": true, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role-principal", "origin_general", "ai opt-in", "msw-2026"]}, {"id": "NZ1LYSfnDSX1uc4OQ96g", "first": "Melanie", "last": "Rice", "name": "Melanie Rice", "phone": "", "email": "melanierice0216@gmail.com", "created": "Jul 14, 2026 05:25 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-assistant-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "Z6LpoQUxbViWTvT9yUoY", "first": "E", "last": "Williams", "name": "E Williams", "phone": "", "email": "erwilliams@marion.k12.sc.us", "created": "Jul 14, 2026 05:25 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role-assistant-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "wEbnbF5V178bq4eatdve", "first": "Jack", "last": "Doyle", "name": "Jack Doyle", "phone": "", "email": "jjdoyle@k12.wv.us", "created": "Jul 14, 2026 05:25 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role-assistant-principal", "msw-2026"]}, {"id": "te2aap9XknzwkYKOryYR", "first": "Cassie", "last": "Stephenson", "name": "Cassie Stephenson", "phone": "", "email": "casandra.stephenson@nn.k12.va.us", "created": "Jul 14, 2026 05:25 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "role-assistant-principal", "msw-2026"]}, {"id": "Eb0LfMxxuMYenlOkVkxl", "first": "Jamie", "last": "Walski", "name": "Jamie Walski", "phone": "", "email": "jamie.walski@cpschools.com", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Other", "books": true, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "role-other", "msw-2026"]}, {"id": "KgP7oclt8zroVsjKPgPf", "first": "Lisa", "last": "Little", "name": "Lisa Little", "phone": "", "email": "littlel@portsmouthschoolsri.org", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-principal", "msw-2026"]}, {"id": "KjnyuHTBSNX34Ra0DJWE", "first": "Sierra", "last": "Golden", "name": "Sierra Golden", "phone": "", "email": "sierra.golden@sccpss.com", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-assistant-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "iVz8QPAVjmjWXK82ubOE", "first": "Rachel", "last": "Gravette", "name": "Rachel Gravette", "phone": "", "email": "rpoe.oh85@yahoo.com", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role-assistant-principal", "msw-2026"]}, {"id": "K3zHsRca9snyURrERX5y", "first": "Natasha", "last": "Brown", "name": "Natasha Brown", "phone": "", "email": "natashabrown@ccs.k12.nc.us", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role-principal", "msw-2026"]}, {"id": "tfudgW5q12w8kz50cmga", "first": "Jeri", "last": "Mcelwee", "name": "Jeri Mcelwee", "phone": "", "email": "jeri.mcelwee@berryhillschools.org", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "District Admin", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role-district-admin", "edco_setter_assigned", "msw-2026"]}, {"id": "xh9BzeKpGJ7Ltc5dv3zg", "first": "Patty", "last": "Nyquist", "name": "Patty Nyquist", "phone": "", "email": "nyquipat100@wcschools.com", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "lPftMVCpKr1hnBM5A2OS", "first": "Charity", "last": "Shea", "name": "Charity Shea", "phone": "", "email": "sheac@portsmouthschoolsri.org", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "District Admin", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "interest-school-engagement", "role-district-admin", "edco_setter_assigned", "msw-2026"]}, {"id": "H76ZvVLYDSUdFKvVVKnN", "first": "Brian", "last": "Leggett", "name": "Brian Leggett", "phone": "", "email": "bleggett@k12.wv.us", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-assistant-principal", "msw-2026"]}, {"id": "4oE8mYYbfqQ14kum08ym", "first": "Lyndsey", "last": "Sparks", "name": "Lyndsey Sparks", "phone": "", "email": "lsparks.om@oxboe.com", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "role-assistant-principal", "msw-2026"]}, {"id": "HyAkZOY7hD5AsMxCyoxv", "first": "Justin", "last": "Lee", "name": "Justin Lee", "phone": "", "email": "jlee@roaneschools.com", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "unknown_role_school", "msw-2026"]}, {"id": "txD9MXoeOCKLkTJBeuwM", "first": "Candy", "last": "Thompson", "name": "Candy Thompson", "phone": "", "email": "candy.thompson@vwsd.org", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "interest-books-materials", "role-assistant-principal", "msw-2026"]}, {"id": "R5PHjkWT618PsyV2kvF2", "first": "Courtney", "last": "Oldham", "name": "Courtney Oldham", "phone": "", "email": "courtneyoldham@mooreschools.com", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["conference_attendee", "handout_requested", "edco_webinar_passed", "role-assistant-principal", "msw-2026"]}, {"id": "uwZ0yAiLu6Q9QhnWyStX", "first": "Callie", "last": "Nunnally", "name": "Callie Nunnally", "phone": "", "email": "callien_nunnally@ccpsnet.net", "created": "Jul 14, 2026 05:24 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "Form", "role": "Assistant Principal", "books": true, "engage": true, "purchased": false, "teacherReferral": false, "tags": ["edco_webinar_passed", "conference_attendee", "handout_requested", "interest-books-materials", "interest-school-engagement", "role-assistant-principal", "edco_setter_assigned", "msw-2026"]}, {"id": "AcyIFXlyVoosmzXJu5U4", "first": "", "last": "", "name": "(No name captured)", "phone": "+18434678759", "email": "", "created": "Jul 14, 2026 05:00 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "aDa1tZDcBw2jQSIhdIKd", "first": "", "last": "", "name": "(No name captured)", "phone": "+18436164475", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "Q3P7Z48NSYkWwtPlc23A", "first": "", "last": "", "name": "(No name captured)", "phone": "+17572024448", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "6ZeWPT7jkCdvvukAVurP", "first": "", "last": "", "name": "(No name captured)", "phone": "+14347746529", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "vHJSemU53tniP3qD2xmj", "first": "", "last": "", "name": "(No name captured)", "phone": "+17578032200", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "GGCu29fx0iO4IsTlO5ss", "first": "", "last": "", "name": "(No name captured)", "phone": "+17176490869", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "keyword_chaos", "msw-2026"]}, {"id": "Sv7nq0LUi8ul5dKpu8TY", "first": "", "last": "", "name": "(No name captured)", "phone": "+12564799170", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "1D2YMOebtS4x4dPUiswT", "first": "", "last": "", "name": "(No name captured)", "phone": "+15094800731", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "keyword_chaos", "msw-2026"]}, {"id": "kXigjtH19f1QPCWIl6SY", "first": "", "last": "", "name": "(No name captured)", "phone": "+14018377785", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "OApBA8J0ODeJAMQiQ9v6", "first": "", "last": "", "name": "(No name captured)", "phone": "+12515913415", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "zyyZjBNBGA3nZcK0luwt", "first": "", "last": "", "name": "(No name captured)", "phone": "+15757498395", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "CPHKptaSSUMfbV78nm8o", "first": "", "last": "", "name": "(No name captured)", "phone": "+17576766956", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "CZMSHvumysQfxHKpe1Zt", "first": "", "last": "", "name": "(No name captured)", "phone": "+19109290042", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "Xf5fC2P58QfAhsqDQV4H", "first": "", "last": "", "name": "(No name captured)", "phone": "+12565256907", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "T6ruJoG6lYmmMKommP0u", "first": "", "last": "", "name": "(No name captured)", "phone": "+13048301050", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "vPDpPR0lKzPL6R7pXEGX", "first": "", "last": "", "name": "(No name captured)", "phone": "+12563102212", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "g0pRs58yk9KfNMgalE81", "first": "", "last": "", "name": "(No name captured)", "phone": "+14196313003", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "3Uct5Li8WksOQLAaL9Xh", "first": "", "last": "", "name": "(No name captured)", "phone": "+12565087052", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "QjC3xvPE0JM0WJupI1wB", "first": "", "last": "", "name": "(No name captured)", "phone": "+14013782127", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "rFCSZ3UyyELf7r7pDPCE", "first": "", "last": "", "name": "(No name captured)", "phone": "+16622517115", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "oSwghVfeJ9ydqyimi0bn", "first": "", "last": "", "name": "(No name captured)", "phone": "+19126607030", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "CHAOS SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "keyword_chaos", "msw-2026"]}, {"id": "IayHTVl1AQFk9xrZA1Yt", "first": "", "last": "", "name": "(No name captured)", "phone": "+12566242341", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "QiZ5Xld9NLJKBIZ4abCy", "first": "", "last": "", "name": "(No name captured)", "phone": "+12564992919", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "hs55uAE27RC4hBRuAVov", "first": "", "last": "", "name": "(No name captured)", "phone": "+12564994104", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "beF2rD3S24RoDjH2ysJm", "first": "", "last": "", "name": "(No name captured)", "phone": "+14059190178", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "Erp9cc4jMGge5pyKWAs1", "first": "", "last": "", "name": "(No name captured)", "phone": "+13042038471", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "O0lBZMRxckRLZ5Ium4os", "first": "", "last": "", "name": "(No name captured)", "phone": "+14232314951", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "w9lDdB1pVTbSpj3TikCC", "first": "", "last": "", "name": "(No name captured)", "phone": "+14056061676", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "Ul4z20qVutRlLTS57GC4", "first": "", "last": "", "name": "(No name captured)", "phone": "+19187204009", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "GWxKWRCu0tYImCLKTpKN", "first": "", "last": "", "name": "(No name captured)", "phone": "+16147875483", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "sJlQ1V3WY61UdShX5MRP", "first": "", "last": "", "name": "(No name captured)", "phone": "+18047123061", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}, {"id": "GSAjTGI33OLiFxlRM0ou", "first": "", "last": "", "name": "(No name captured)", "phone": "+12563109892", "email": "", "created": "Jul 14, 2026 04:59 PM", "day": "2026-07-14", "dayLabel": "Day 1 \u2014 Tue Jul 14 (The Discipline Game Plan)", "channel": "GAMEPLAN SMS", "role": "Unknown", "books": false, "engage": false, "purchased": false, "teacherReferral": false, "tags": ["keyword_gameplan", "msw-2026"]}];
+
+// ---------- helpers ----------
+function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function channelPill(ch){
+  if(ch==='Form') return '<span class="pill pill-form">Form</span>';
+  if(ch==='CHAOS SMS') return '<span class="pill pill-chaos">CHAOS SMS</span>';
+  if(ch==='GAMEPLAN SMS') return '<span class="pill pill-gameplan">GAMEPLAN SMS</span>';
+  return '<span class="pill pill-none">'+esc(ch)+'</span>';
+}
+function interestPill(c){
+  if(c.books && c.engage) return '<span class="pill pill-both">Both</span>';
+  if(c.books) return '<span class="pill pill-books">Books/Materials</span>';
+  if(c.engage) return '<span class="pill pill-engage">School Visit</span>';
+  return '<span class="pill pill-none">—</span>';
+}
+
+const DAYS = [...new Set(DATA.map(c=>c.day))].sort();
+const DAY_LABELS = {};
+DATA.forEach(c=>DAY_LABELS[c.day]=c.dayLabel);
+
+document.getElementById('lastPull').textContent = DATA.length ? DATA.reduce((a,b)=>a.created>b.created?a:b).created : '—';
+document.getElementById('metaTotal').textContent = DATA.length;
+
+// ---------- KPI row ----------
+const total = DATA.length;
+const formLeads = DATA.filter(c=>c.channel==='Form');
+const chaosLeads = DATA.filter(c=>c.channel==='CHAOS SMS');
+const gameplanLeads = DATA.filter(c=>c.channel==='GAMEPLAN SMS');
+const booksAny = DATA.filter(c=>c.books).length;
+const engageAny = DATA.filter(c=>c.engage).length;
+const purchased = DATA.filter(c=>c.purchased).length;
+
+function kpi(num,label,accent){
+  return `<div class="kpi" style="--kpi-accent:${accent}"><div class="num">${num}</div><div class="lbl">${label}</div></div>`;
+}
+document.getElementById('kpiRow').innerHTML = [
+  kpi(total,'Total Contacts','#0D2B6B'),
+  kpi(formLeads.length,'Form Submissions','#1565C0'),
+  kpi(chaosLeads.length+gameplanLeads.length,'SMS Keyword Leads','#F9A825'),
+  kpi(booksAny,'Want Books/Materials','#B8860B'),
+  kpi(engageAny,'Want School Visit','#1B5E20'),
+  kpi(purchased,'Tripwire Purchases','#8B2E24'),
+].join('');
+
+// ---------- Overview cards ----------
+document.getElementById('channelCards').innerHTML = [
+  {t:'Form Submissions', d:'Handout form, full contact info', n:formLeads.length},
+  {t:'CHAOS SMS', d:'Phone only, texted CHAOS keyword', n:chaosLeads.length},
+  {t:'GAMEPLAN SMS', d:'Phone only, texted GAMEPLAN keyword', n:gameplanLeads.length},
+].map(x=>`<div class="stat-card"><div class="title">${x.t}</div><div class="desc">${x.d}</div><div class="big">${x.n}</div></div>`).join('');
+
+const bothCount = formLeads.filter(c=>c.books&&c.engage).length;
+const booksOnlyCount = formLeads.filter(c=>c.books&&!c.engage).length;
+const engageOnlyCount = formLeads.filter(c=>c.engage&&!c.books).length;
+const neitherCount = formLeads.filter(c=>!c.books&&!c.engage).length;
+
+document.getElementById('interestCards').innerHTML = [
+  {t:'Both', d:'Books/materials AND school visit', n:bothCount, accent:'#0D2B6B'},
+  {t:'Books & Materials only', d:'Just wants the materials', n:booksOnlyCount, accent:'#B8860B'},
+  {t:'School Visit only', d:'Wants EDCO at their school', n:engageOnlyCount, accent:'#1B5E20'},
+  {t:'Neither checked', d:'Plain handout download only', n:neitherCount, accent:'#9AA0AC'},
+].map(x=>`<div class="stat-card"><div class="title">${x.t}</div><div class="desc">${x.d}</div><div class="big">${x.n}</div></div>`).join('');
+
+// ---------- By Day panel ----------
+let byDayHtml = '';
+DAYS.forEach(day=>{
+  const dayContacts = DATA.filter(c=>c.day===day);
+  const form = dayContacts.filter(c=>c.channel==='Form');
+  const chaos = dayContacts.filter(c=>c.channel==='CHAOS SMS');
+  const gp = dayContacts.filter(c=>c.channel==='GAMEPLAN SMS');
+  const both = form.filter(c=>c.books&&c.engage).length;
+  const bOnly = form.filter(c=>c.books&&!c.engage).length;
+  const eOnly = form.filter(c=>c.engage&&!c.books).length;
+  const neither = form.filter(c=>!c.books&&!c.engage).length;
+
+  byDayHtml += `
+    <div class="section-title"><span class="bar"></span>${esc(DAY_LABELS[day])}</div>
+    <div class="card-grid">
+      ${kpiCard('Total contacts', dayContacts.length)}
+      ${kpiCard('Form submissions', form.length)}
+      ${kpiCard('CHAOS SMS', chaos.length)}
+      ${kpiCard('GAMEPLAN SMS', gp.length)}
+    </div>
+    <div class="card-grid" style="margin-top:4px">
+      ${kpiCard('Want Both', both, '#0D2B6B')}
+      ${kpiCard('Books/Materials only', bOnly, '#B8860B')}
+      ${kpiCard('School Visit only', eOnly, '#1B5E20')}
+      ${kpiCard('Neither checked', neither, '#9AA0AC')}
+    </div>
+  `;
+});
+function kpiCard(label, num, accent){
+  return `<div class="stat-card" style="cursor:default"><div class="desc">${label}</div><div class="big" style="${accent?('color:'+accent):''}">${num}</div></div>`;
+}
+document.getElementById('byDayContent').innerHTML = byDayHtml;
+
+// ---------- By Position cards ----------
+const roles = [...new Set(formLeads.map(c=>c.role))];
+const roleCounts = {};
+roles.forEach(r=>roleCounts[r]=formLeads.filter(c=>c.role===r).length);
+const roleOrder = ['Principal','Assistant Principal','District Admin','Teacher','Other','Unknown'];
+const sortedRoles = roleOrder.filter(r=>roles.includes(r)).concat(roles.filter(r=>!roleOrder.includes(r)));
+
+document.getElementById('positionCards').innerHTML = sortedRoles.map(r=>{
+  const bk = formLeads.filter(c=>c.role===r && c.books).length;
+  const eg = formLeads.filter(c=>c.role===r && c.engage).length;
+  return `<div class="stat-card" data-role="${esc(r)}"><div class="title">${esc(r)}</div><div class="desc">${bk} want materials · ${eg} want visit</div><div class="big">${roleCounts[r]}</div></div>`;
+}).join('');
+
+// role filter dropdown
+const posRoleSel = document.getElementById('posRoleFilter');
+posRoleSel.innerHTML = '<option value="">All roles</option>' + sortedRoles.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+
+document.querySelectorAll('#positionCards .stat-card').forEach(card=>{
+  card.addEventListener('click', ()=>{
+    posRoleSel.value = card.dataset.role;
+    renderPosTable();
+  });
+});
+
+// ---------- Generic table renderer ----------
+function buildTableHead(cols){
+  return '<tr>' + cols.map(c=>`<th data-key="${c.key}">${c.label}<span class="arrow"></span></th>`).join('') + '</tr>';
+}
+
+function rowHtml(c, cols){
+  return '<tr>' + cols.map(col=>col.render(c)).join('') + '</tr>';
+}
+
+const colName = {key:'name', label:'Name', render:c=>`<td class="name-cell">${esc(c.name)}</td>`};
+const colEmail = {key:'email', label:'Email', render:c=>`<td class="email-cell">${esc(c.email)||'—'}</td>`};
+const colPhone = {key:'phone', label:'Phone', render:c=>`<td class="phone-cell">${esc(c.phone)||'—'}</td>`};
+const colRole = {key:'role', label:'Role', render:c=>`<td class="role-badge">${esc(c.role)}</td>`};
+const colChannel = {key:'channel', label:'Channel', render:c=>`<td>${channelPill(c.channel)}</td>`};
+const colInterest = {key:'interest', label:'Interest', render:c=>`<td>${interestPill(c)}</td>`};
+const colDay = {key:'day', label:'Day', render:c=>`<td>${c.day==='2026-07-14'?'Day 1':'Day 2'}</td>`};
+const colCreated = {key:'created', label:'Captured', render:c=>`<td class="email-cell">${esc(c.created)}</td>`};
+const colPurchased = {key:'purchased', label:'Purchased', render:c=>`<td>${c.purchased?'<span class="pill pill-purchased">Yes — $47</span>':'—'}</td>`};
+
+let sortState = {};
+
+function attachSort(tableId, cols, dataGetter, renderFn){
+  const table = document.getElementById(tableId);
+  table.querySelector('thead').addEventListener('click', e=>{
+    const th = e.target.closest('th');
+    if(!th) return;
+    const key = th.dataset.key;
+    if(!sortState[tableId]) sortState[tableId] = {key:null, dir:1};
+    if(sortState[tableId].key===key) sortState[tableId].dir *= -1;
+    else { sortState[tableId].key = key; sortState[tableId].dir = 1; }
+    renderFn();
+  });
+}
+
+// ---------- Position table ----------
+const posCols = [colName, colEmail, colPhone, colRole, colInterest, colDay];
+document.getElementById('posTable').querySelector('thead').innerHTML = buildTableHead(posCols);
+
+function renderPosTable(){
+  const q = document.getElementById('posSearch').value.toLowerCase();
+  const roleF = document.getElementById('posRoleFilter').value;
+  let rows = formLeads.filter(c=>{
+    if(roleF && c.role!==roleF) return false;
+    if(q && !(c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q))) return false;
+    return true;
+  });
+  rows = sortRows(rows, 'posTable');
+  document.getElementById('posCount').textContent = rows.length + ' contact' + (rows.length!==1?'s':'');
+  const tbody = document.getElementById('posTable').querySelector('tbody');
+  tbody.innerHTML = rows.length ? rows.map(c=>rowHtml(c,posCols)).join('') : `<tr class="empty-row"><td colspan="${posCols.length}">No contacts match this filter.</td></tr>`;
+}
+function sortRows(rows, tableId){
+  const st = sortState[tableId];
+  if(!st || !st.key) return rows;
+  return [...rows].sort((a,b)=>{
+    let av = a[st.key]!==undefined?a[st.key]:'', bv = b[st.key]!==undefined?b[st.key]:'';
+    if(st.key==='interest'){ av = (a.books?1:0)+(a.engage?1:0); bv=(b.books?1:0)+(b.engage?1:0); }
+    if(typeof av==='string') av = av.toLowerCase();
+    if(typeof bv==='string') bv = bv.toLowerCase();
+    if(av<bv) return -1*st.dir;
+    if(av>bv) return 1*st.dir;
+    return 0;
+  });
+}
+attachSort('posTable', posCols, ()=>formLeads, renderPosTable);
+document.getElementById('posSearch').addEventListener('input', renderPosTable);
+document.getElementById('posRoleFilter').addEventListener('change', renderPosTable);
+renderPosTable();
+
+// ---------- Books table ----------
+const booksCols = [colName, colEmail, colPhone, colRole, colDay];
+document.getElementById('booksTable').querySelector('thead').innerHTML = buildTableHead(booksCols);
+const booksDaySel = document.getElementById('booksDayFilter');
+booksDaySel.innerHTML = '<option value="">All days</option>' + DAYS.map(d=>`<option value="${d}">${esc(DAY_LABELS[d])}</option>`).join('');
+
+function renderBooksTable(){
+  const q = document.getElementById('booksSearch').value.toLowerCase();
+  const dayF = booksDaySel.value;
+  let rows = formLeads.filter(c=>c.books);
+  if(dayF) rows = rows.filter(c=>c.day===dayF);
+  if(q) rows = rows.filter(c=>c.name.toLowerCase().includes(q)||c.email.toLowerCase().includes(q)||c.phone.toLowerCase().includes(q));
+  rows = sortRows(rows, 'booksTable');
+  document.getElementById('booksCount').textContent = rows.length + ' contact' + (rows.length!==1?'s':'');
+  document.getElementById('booksTable').querySelector('tbody').innerHTML = rows.length ? rows.map(c=>rowHtml(c,booksCols)).join('') : `<tr class="empty-row"><td colspan="${booksCols.length}">No contacts match this filter.</td></tr>`;
+}
+attachSort('booksTable', booksCols, null, renderBooksTable);
+document.getElementById('booksSearch').addEventListener('input', renderBooksTable);
+booksDaySel.addEventListener('change', renderBooksTable);
+renderBooksTable();
+
+// ---------- Engage table ----------
+const engageCols = [colName, colEmail, colPhone, colRole, colDay];
+document.getElementById('engageTable').querySelector('thead').innerHTML = buildTableHead(engageCols);
+const engageDaySel = document.getElementById('engageDayFilter');
+engageDaySel.innerHTML = '<option value="">All days</option>' + DAYS.map(d=>`<option value="${d}">${esc(DAY_LABELS[d])}</option>`).join('');
+
+function renderEngageTable(){
+  const q = document.getElementById('engageSearch').value.toLowerCase();
+  const dayF = engageDaySel.value;
+  let rows = formLeads.filter(c=>c.engage);
+  if(dayF) rows = rows.filter(c=>c.day===dayF);
+  if(q) rows = rows.filter(c=>c.name.toLowerCase().includes(q)||c.email.toLowerCase().includes(q)||c.phone.toLowerCase().includes(q));
+  rows = sortRows(rows, 'engageTable');
+  document.getElementById('engageCount').textContent = rows.length + ' contact' + (rows.length!==1?'s':'');
+  document.getElementById('engageTable').querySelector('tbody').innerHTML = rows.length ? rows.map(c=>rowHtml(c,engageCols)).join('') : `<tr class="empty-row"><td colspan="${engageCols.length}">No contacts match this filter.</td></tr>`;
+}
+attachSort('engageTable', engageCols, null, renderEngageTable);
+document.getElementById('engageSearch').addEventListener('input', renderEngageTable);
+engageDaySel.addEventListener('change', renderEngageTable);
+renderEngageTable();
+
+// ---------- SMS-only table ----------
+const smsCols = [colPhone, colChannel, colDay, colCreated, colPurchased];
+document.getElementById('smsTable').querySelector('thead').innerHTML = buildTableHead(smsCols);
+const smsChannelSel = document.getElementById('smsChannelFilter');
+smsChannelSel.innerHTML = '<option value="">All keywords</option><option value="CHAOS SMS">CHAOS SMS</option><option value="GAMEPLAN SMS">GAMEPLAN SMS</option>';
+const smsOnly = DATA.filter(c=>c.channel==='CHAOS SMS'||c.channel==='GAMEPLAN SMS');
+
+function renderSmsTable(){
+  const q = document.getElementById('smsSearch').value.toLowerCase();
+  const chF = smsChannelSel.value;
+  let rows = smsOnly;
+  if(chF) rows = rows.filter(c=>c.channel===chF);
+  if(q) rows = rows.filter(c=>c.phone.toLowerCase().includes(q));
+  rows = sortRows(rows, 'smsTable');
+  document.getElementById('smsCount').textContent = rows.length + ' contact' + (rows.length!==1?'s':'');
+  document.getElementById('smsTable').querySelector('tbody').innerHTML = rows.length ? rows.map(c=>rowHtml(c,smsCols)).join('') : `<tr class="empty-row"><td colspan="${smsCols.length}">No contacts match this filter.</td></tr>`;
+}
+attachSort('smsTable', smsCols, null, renderSmsTable);
+document.getElementById('smsSearch').addEventListener('input', renderSmsTable);
+smsChannelSel.addEventListener('change', renderSmsTable);
+renderSmsTable();
+
+// ---------- All contacts table ----------
+const allCols = [colName, colEmail, colPhone, colChannel, colRole, colInterest, colDay, colCreated];
+document.getElementById('allTable').querySelector('thead').innerHTML = buildTableHead(allCols);
+const allDaySel = document.getElementById('allDayFilter');
+allDaySel.innerHTML = '<option value="">All days</option>' + DAYS.map(d=>`<option value="${d}">${esc(DAY_LABELS[d])}</option>`).join('');
+const allChannelSel = document.getElementById('allChannelFilter');
+allChannelSel.innerHTML = '<option value="">All channels</option><option value="Form">Form</option><option value="CHAOS SMS">CHAOS SMS</option><option value="GAMEPLAN SMS">GAMEPLAN SMS</option>';
+const allRoleSel = document.getElementById('allRoleFilter');
+allRoleSel.innerHTML = '<option value="">All roles</option>' + sortedRoles.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+
+function renderAllTable(){
+  const q = document.getElementById('allSearch').value.toLowerCase();
+  const dayF = allDaySel.value, chF = allChannelSel.value, roleF = allRoleSel.value;
+  let rows = DATA;
+  if(dayF) rows = rows.filter(c=>c.day===dayF);
+  if(chF) rows = rows.filter(c=>c.channel===chF);
+  if(roleF) rows = rows.filter(c=>c.role===roleF);
+  if(q) rows = rows.filter(c=>c.name.toLowerCase().includes(q)||c.email.toLowerCase().includes(q)||c.phone.toLowerCase().includes(q));
+  rows = sortRows(rows, 'allTable');
+  document.getElementById('allCount').textContent = rows.length + ' contact' + (rows.length!==1?'s':'');
+  document.getElementById('allTable').querySelector('tbody').innerHTML = rows.length ? rows.map(c=>rowHtml(c,allCols)).join('') : `<tr class="empty-row"><td colspan="${allCols.length}">No contacts match this filter.</td></tr>`;
+}
+attachSort('allTable', allCols, null, renderAllTable);
+document.getElementById('allSearch').addEventListener('input', renderAllTable);
+allDaySel.addEventListener('change', renderAllTable);
+allChannelSel.addEventListener('change', renderAllTable);
+allRoleSel.addEventListener('change', renderAllTable);
+renderAllTable();
+
+// ---------- Tabs ----------
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+// tab counts
+document.querySelector('.tab[data-tab="byday"]').innerHTML = 'By Day / Session';
+document.querySelector('.tab[data-tab="byposition"]').innerHTML = `By Position <span class="count">${formLeads.length}</span>`;
+document.querySelector('.tab[data-tab="books"]').innerHTML = `Wants Books &amp; Materials <span class="count">${booksAny}</span>`;
+document.querySelector('.tab[data-tab="engage"]').innerHTML = `Wants School Visit <span class="count">${engageAny}</span>`;
+document.querySelector('.tab[data-tab="sms"]').innerHTML = `SMS-Only Leads <span class="count">${smsOnly.length}</span>`;
+document.querySelector('.tab[data-tab="all"]').innerHTML = `All Contacts <span class="count">${total}</span>`;
+</script>
+
+</body>
+</html>
