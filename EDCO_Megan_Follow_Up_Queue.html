@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDCO — Megan's SREB Follow-Up Queue</title>
+<style>
+  :root{
+    --navy:#0D2B6B; --blue:#1565C0; --green-dark:#1B5E20; --green-mid:#2E7D32;
+    --gold:#F9A825; --text-dark:#1A1A2E; --bg:#F5F6F9; --card:#FFFFFF;
+    --border:#E2E5EC; --muted:#6B7280; --red:#C0392B; --red-bg:#FDEDEC;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:Calibri,"Segoe UI",-apple-system,BlinkMacSystemFont,Arial,sans-serif;background:var(--bg);color:var(--text-dark);-webkit-font-smoothing:antialiased;}
+  .gradient-bar{height:6px;background:linear-gradient(90deg,var(--gold) 0%,var(--blue) 50%,var(--green-dark) 100%);}
+  .topbar{background:var(--navy);color:#fff;padding:22px 32px 18px;}
+  .topbar .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:700;color:var(--gold);margin-bottom:6px;}
+  .topbar h1{margin:0 0 4px;font-size:26px;font-weight:700;letter-spacing:-.01em;}
+  .topbar .sub{font-size:13px;color:#C9D3EA;}
+
+  .progress-wrap{padding:18px 32px 0;}
+  .progress-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+  .progress-num{font-size:26px;font-weight:700;color:var(--navy);}
+  .progress-bar-track{flex:1;min-width:200px;height:10px;background:#EEF0F3;border-radius:6px;overflow:hidden;}
+  .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green-dark));transition:width .3s;}
+  .progress-label{font-size:12px;color:var(--muted);font-weight:600;}
+  .reset-btn{font-size:11.5px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer;}
+  .reset-btn:hover{background:#F5F6F9;}
+
+  .tabbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--border);margin-top:16px;padding:0 32px;display:flex;gap:2px;overflow-x:auto;}
+  .tab{padding:14px 16px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;user-select:none;}
+  .tab:hover{color:var(--navy);}
+  .tab.active{color:var(--navy);border-bottom-color:var(--gold);}
+  .tab .count{display:inline-block;margin-left:6px;background:var(--bg);color:var(--navy);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700;}
+  .tab.active .count{background:var(--navy);color:#fff;}
+  .tab.urgent{color:var(--red);}
+  .tab.urgent .count{background:var(--red);color:#fff;}
+
+  .content{padding:24px 32px 60px;max-width:1000px;}
+  .panel{display:none;animation:fadein .15s ease;}
+  .panel.active{display:block;}
+  @keyframes fadein{from{opacity:0;}to{opacity:1;}}
+
+  .section-intro{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 18px;}
+  .section-intro b{color:var(--text-dark);}
+
+  .flag-box{background:var(--red-bg);border:1px solid #F3C5C0;border-radius:10px;padding:16px 18px;margin-bottom:16px;}
+  .flag-box .title{font-weight:700;color:#6E1E17;font-size:14px;margin-bottom:6px;}
+  .flag-box .body{font-size:13px;color:#8B2E24;line-height:1.5;}
+
+  .lead-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:14px;transition:opacity .2s;}
+  .lead-card.done{opacity:.5;}
+  .lead-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
+  .lead-name{font-size:16px;font-weight:700;color:var(--navy);}
+  .lead-contact{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .lead-contact span{margin-right:14px;}
+  .status-select{padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:12.5px;font-family:inherit;background:#fff;cursor:pointer;}
+  .status-select.status-called{background:#E1EFE2;border-color:var(--green-dark);color:var(--green-dark);font-weight:700;}
+  .status-select.status-vm{background:#FDF0DA;border-color:#B8860B;color:#B8860B;font-weight:700;}
+  .status-select.status-noanswer{background:#EEF0F3;color:var(--muted);}
+  .status-select.status-booked{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700;}
+  .context-list{margin:10px 0;padding-left:0;list-style:none;}
+  .context-list li{font-size:13px;color:var(--text-dark);padding:4px 0 4px 18px;position:relative;line-height:1.4;}
+  .context-list li::before{content:"•";position:absolute;left:0;color:var(--gold);font-weight:700;}
+  .script-box{background:#F5F6F9;border-left:3px solid var(--blue);border-radius:6px;padding:12px 14px;margin-top:10px;font-size:12.5px;color:var(--text-dark);line-height:1.5;font-style:italic;}
+  .script-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--blue);font-weight:700;font-style:normal;margin-bottom:4px;}
+  .lead-flags{margin-top:10px;}
+  .lead-flag{background:var(--red-bg);border:1px solid #F3C5C0;border-radius:6px;padding:8px 12px;font-size:12px;color:#8B2E24;margin-top:6px;font-weight:600;}
+  .lead-note{font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;}
+
+  .simple-row{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+  .simple-row.done{opacity:.45;}
+  .simple-row .info{flex:1;min-width:200px;}
+  .simple-row .name{font-weight:700;font-size:14px;color:var(--text-dark);}
+  .simple-row .meta{font-size:12px;color:var(--muted);margin-top:2px;}
+  .simple-row .meta span{margin-right:12px;}
+  .role-badge{display:inline-block;background:#E3ECFB;color:var(--blue);font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:12px;margin-right:8px;}
+  .books-badge{display:inline-block;background:#FDF0DA;color:#B8860B;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:12px;}
+  .note-badge{display:inline-block;background:#EEF0F3;color:var(--muted);font-size:10.5px;font-style:italic;padding:2px 8px;border-radius:12px;margin-left:6px;}
+
+  .section-title{font-size:16px;font-weight:700;color:var(--navy);margin:22px 0 12px;display:flex;align-items:center;gap:10px;}
+  .section-title:first-child{margin-top:0;}
+  .section-title .bar{width:4px;height:16px;background:var(--gold);border-radius:2px;}
+
+  footer{padding:20px 32px 40px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--border);margin-top:20px;}
+
+  @media (max-width:640px){.topbar,.tabbar,.content,.progress-wrap{padding-left:16px;padding-right:16px;}}
+  @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;}}
+</style>
+</head>
+<body>
+
+<div class="gradient-bar"></div>
+<div class="topbar">
+  <div class="eyebrow">The Education Company</div>
+  <h1>Megan's SREB Follow-Up Queue</h1>
+  <div class="sub">Work each tab top to bottom. Mark status as you go — your progress is saved automatically in this browser. → <a href="https://drglanton.github.io/General/EDCO_SREB_Lead_Dashboard.html" style="color:var(--gold);font-weight:700;">Open the full lead dashboard</a></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-card">
+    <div class="progress-num" id="progressNum">0 / 0</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-label">leads contacted</div>
+    <button class="reset-btn" id="resetBtn">Reset all progress</button>
+  </div>
+</div>
+
+<div class="tabbar" id="tabbar">
+  <div class="tab urgent active" data-tab="compliance">⚠ Compliance</div>
+  <div class="tab" data-tab="hot">🔥 Hot Leads</div>
+  <div class="tab" data-tab="medium">🟡 Medium Leads</div>
+  <div class="tab" data-tab="tier1">Tier 1 — Principals/Admin</div>
+  <div class="tab" data-tab="tier2">Tier 2 — Assistant Principals</div>
+  <div class="tab" data-tab="tier3">Tier 3 — Qualify First</div>
+  <div class="tab" data-tab="teachers">Teacher Referrals</div>
+  <div class="tab" data-tab="notes">Data Notes</div>
+</div>
+
+<div class="content">
+
+  <div class="panel active" id="panel-compliance">
+    <div class="section-title"><span class="bar"></span>Do Not Contact</div>
+    <div class="section-intro">Legal opt-out requests. These people must never be called, texted, or emailed again — no exceptions, regardless of what list they show up on elsewhere.</div>
+    <div id="complianceList"></div>
+  </div>
+
+  <div class="panel" id="panel-hot">
+    <div class="section-title"><span class="bar"></span>Call these today</div>
+    <div class="section-intro">Real-time buying signals from live SMS conversations at the conference. These are your highest-probability closes right now — every hour that passes lowers the odds.</div>
+    <div class="flag-box" id="thomasHandlingBox" style="background:#E3ECFB;border-color:#B7CCF0;">
+      <div class="title" style="color:var(--navy);">Dr. Glanton is personally handling these — do not contact</div>
+      <div class="body" style="color:var(--navy);" id="thomasHandlingBody"></div>
+    </div>
+    <div id="hotList"></div>
+  </div>
+
+  <div class="panel" id="panel-medium">
+    <div class="section-title"><span class="bar"></span>Named their pain, gave contact info</div>
+    <div class="section-intro">These replied to a keyword text with both an email <b>and</b> a specific problem — the strongest signal short of asking about price. Follow up this week.</div>
+    <div id="mediumList"></div>
+  </div>
+
+  <div class="panel" id="panel-tier1">
+    <div class="section-title"><span class="bar"></span>Principals &amp; District Admins</div>
+    <div class="section-intro">These leads can sign a contract without looping in anyone else. Every name checked "bring EDCO to my school" on the conference handout form — this is warm, not cold.</div>
+    <div id="tier1List"></div>
+  </div>
+
+  <div class="panel" id="panel-tier2">
+    <div class="section-title"><span class="bar"></span>Assistant Principals</div>
+    <div class="section-intro">Likely influencers on the decision. Ask directly: "Are you the one who'd sign off, or should I also loop in your principal?"</div>
+    <div id="tier2List"></div>
+  </div>
+
+  <div class="panel" id="panel-tier3">
+    <div class="section-title"><span class="bar"></span>Qualify First</div>
+    <div class="section-intro">Role unclear from the form. Open with: "Are you the one who'd sign off on bringing us in, or should I loop in your principal too?" — confirm authority before pitching.</div>
+    <div id="tier3List"></div>
+  </div>
+
+  <div class="panel" id="panel-teachers">
+    <div class="section-title"><span class="bar"></span>Teacher Referrals — separate track</div>
+    <div class="section-intro">
+      <b>84 teachers</b> are already enrolled in the Teacher Referral Kit Delivery workflow (auto-fired on tag) — full list lives in GHL: Automation → Teacher Referral Kit Delivery → Enrollment History. They are NOT direct buyers; teachers cannot authorize an EDCO contract.<br><br>
+      Your job on these calls is the two-offer script: they earn the Teacher Reward Package once their principal completes a free Strategy Session. Get the principal's name and contact info, and log every call on the Teacher Referral Form.
+    </div>
+    <div class="flag-box">
+      <div class="title">Skip / handle with care</div>
+      <div class="body">
+        • <b>Lesley Glanton</b> — internal test entry, not a real referral, skip.<br>
+        • <b>Trudy Duncan</b> — enrolled July 2nd, separate from this conference batch, status shows "Finished" with no follow-up logged. Worth a manual check-in call.<br>
+        • <b>Tasha Thompson</b> — see Hot Leads tab. Duplicate contact + AI opt-out flag, human call only.
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-notes">
+    <div class="section-title"><span class="bar"></span>Data notes — read before you start dialing</div>
+    <ul style="font-size:13px;line-height:1.8;color:var(--text-dark);padding-left:20px;">
+      <li><b>Tasha Thompson</b> exists as two contact records with the same email (tthompson@vwsd.org) — one from the handout form, one from texting CHAOS. Merge in GHL (Form record as Master) before calling. She is also tagged <b>ai_opted_out</b> — the outbound AI already left her a voicemail, so this needs a human call, not another automated touch.</li>
+      <li><b>Amber Mcneal</b> — same type of duplicate, already merged earlier in the conference. No action needed, just noting the pattern.</li>
+      <li>Phone numbers are blank for many form leads — the handout form only collects email, not phone. Use email to search Nutshell, or check whether a matching SMS keyword record exists for the same person.</li>
+      <li>"Thomas Glanton" / thomas.glanton@fora.travel is Dr. Glanton's own test entry from the form — already excluded from every list above.</li>
+      <li>Live SREB dashboard with full contact data and search: <a href="https://drglanton.github.io/General/EDCO_SREB_Lead_Dashboard.html" target="_blank">drglanton.github.io/General/EDCO_SREB_Lead_Dashboard.html</a></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>The Education Company &nbsp;|&nbsp; 5916 East Lake Pkwy PMB 103, McDonough GA 30252 &nbsp;|&nbsp; 800-294-9009</footer>
+
+<script>
+const DATA = {
+  "compliance": [
+    {
+      "name": "Jeffrey Poynter",
+      "phone": "(702) 799-1345",
+      "note": "Replied \"Please unsubscribe me from further emails. I have tried to unsubscribe myself... several times.\" Repeated failed opt-out. Must be suppressed from ALL lists immediately \u2014 do not call, text, or email."
+    }
+  ],
+  "hotLeads": [
+    {
+      "name": "Tasha Thompson",
+      "email": "tthompson@vwsd.org",
+      "phone": "(601) 630-5361",
+      "context": [
+        "Vicksburg Warren SD, Vicksburg Junior High School",
+        "Named pain: classroom disruption, office referrals",
+        "Said: \u201cI'll talk to my administrator and see... for now the framework and workbook\u201d",
+        "Confirmed: \u201cYes sounds good\u201d"
+      ],
+      "script": "Tasha \u2014 checking in on the framework and workbook, and wanted to see if you'd had a chance to talk to your administrator yet. Happy to answer any questions for them directly if that's helpful.",
+      "flags": [
+        "DUPLICATE CONTACT \u2014 exists as both a Form record and an SMS record with the same email. Merge before calling (Form record as Master).",
+        "DO NOT USE AI CALLING \u2014 she is tagged ai_opted_out. The outbound AI already left her a voicemail. This call must come from a human (you)."
+      ]
+    }
+  ],
+  "mediumLeads": [
+    {
+      "name": "(unnamed)",
+      "email": "Naharris@petersburg.k12.va.us",
+      "phone": "(804) 334-7792",
+      "pain": "Classroom disruption, classroom management, discipline inconsistency"
+    },
+    {
+      "name": "(unnamed)",
+      "email": "Apopolizio@scgreencharter.org",
+      "phone": "(336) 264-5991",
+      "pain": "Classroom disruptions, inconsistent consequences, middle school team"
+    },
+    {
+      "name": "Michael Mckenzie",
+      "email": "mimckenzie@petersburg.k12.va.us",
+      "phone": "(804) 605-6839",
+      "pain": "Office referrals piling up, inconsistent consequences"
+    },
+    {
+      "name": "Candy Thompson",
+      "email": "candy.thompson@vwsd.org",
+      "phone": "(601) 831-8745",
+      "pain": "Skipping class and tardies"
+    },
+    {
+      "name": "(unnamed)",
+      "email": "larankins@fairfieldk12.org",
+      "phone": "(205) 602-5632",
+      "pain": "Consistency across staff, classroom disruptions"
+    },
+    {
+      "name": "E Williams",
+      "email": "Erwilliams@marion.k12.sc.us",
+      "phone": "(843) 616-4475",
+      "pain": "Tardy and skipping class"
+    },
+    {
+      "name": "(unnamed)",
+      "email": "Brown.felisha.c@muscogee.k12.ga.us",
+      "phone": "(706) 577-4284",
+      "pain": "Skipping, apathy, defiance"
+    },
+    {
+      "name": "Melanie Rice",
+      "email": "Melanierice0216@gmail.com",
+      "phone": "(843) 467-8759",
+      "pain": "\u201cOnly 1 AP for 770 students\u201d \u2014 staffing overwhelm"
+    },
+    {
+      "name": "Callie Nunnally",
+      "email": "Callien_nunnally@ccpsnet.net",
+      "phone": "(804) 712-3061",
+      "pain": "Office referrals"
+    },
+    {
+      "name": "Kathy",
+      "email": "Kskinner@jefcoed.com",
+      "phone": "(205) 516-8884",
+      "pain": "Apathy, frustration, inconsistency \u2014 works as an Interventionist"
+    },
+    {
+      "name": "(unnamed)",
+      "email": "",
+      "phone": "(434) 941-9183",
+      "pain": "Specifically asked for phrases to use with parents"
+    }
+  ],
+  "tier1": [
+    {
+      "name": "Gina Sabol",
+      "email": "gsabol@horrycountyschools.net",
+      "phone": "(843) 488-7517",
+      "role": "Principal",
+      "books": false,
+      "note": "See Hot Leads"
+    },
+    {
+      "name": "Matthew Canada",
+      "email": "canadam@nlcs.k12.in.us",
+      "phone": "",
+      "role": "Principal",
+      "books": true
+    },
+    {
+      "name": "Amber Bullard",
+      "email": "amber.bullard@durantisd.org",
+      "phone": "(580) 931-3743",
+      "role": "Principal",
+      "books": true
+    },
+    {
+      "name": "Scott Strainge",
+      "email": "sstrainge@gmail.com",
+      "phone": "",
+      "role": "Principal",
+      "books": true,
+      "note": "See Hot Leads"
+    },
+    {
+      "name": "Bobby Godwin",
+      "email": "bdgodwin@bladen.k12.nc.us",
+      "phone": "",
+      "role": "Principal",
+      "books": true
+    },
+    {
+      "name": "Monte Johnson",
+      "email": "montejohnson204407@gmail.com",
+      "phone": "",
+      "role": "Principal",
+      "books": true
+    },
+    {
+      "name": "Patty Nyquist",
+      "email": "nyquipat100@wcschools.com",
+      "phone": "",
+      "role": "Principal",
+      "books": true
+    },
+    {
+      "name": "Alvina Matthews",
+      "email": "amatthews@sussex.k12.va.us",
+      "phone": "(434) 378-1235",
+      "role": "District Admin",
+      "books": true
+    },
+    {
+      "name": "Charlayne Jordan",
+      "email": "cjordan@greene.k12.al.us",
+      "phone": "(205) 496-2103",
+      "role": "District Admin",
+      "books": true
+    },
+    {
+      "name": "Jeri Mcelwee",
+      "email": "jeri.mcelwee@berryhillschools.org",
+      "phone": "",
+      "role": "District Admin",
+      "books": true
+    },
+    {
+      "name": "Charity Shea",
+      "email": "sheac@portsmouthschoolsri.org",
+      "phone": "",
+      "role": "District Admin",
+      "books": true
+    }
+  ],
+  "tier2": [
+    {
+      "name": "Tashara King",
+      "email": "tasharaking08@gmail.com",
+      "phone": "(205) 225-8188",
+      "books": true
+    },
+    {
+      "name": "Van James",
+      "email": "vjames@jefcoed.com",
+      "phone": "(205) 215-8476",
+      "books": true
+    },
+    {
+      "name": "Kristilyn Porterfield",
+      "email": "kporterfield@fairfieldk12.org",
+      "phone": "(205) 757-7806",
+      "books": true
+    },
+    {
+      "name": "Sean Patterson",
+      "email": "sean.patterson@sktcs.org",
+      "phone": "",
+      "books": false
+    },
+    {
+      "name": "Pamela Pulliam",
+      "email": "pamela.pulliam@nn.k12.va.us",
+      "phone": "(804) 691-2805",
+      "books": true
+    },
+    {
+      "name": "Porschae Brown",
+      "email": "pbrown@hsd2.org",
+      "phone": "(719) 217-4149",
+      "books": true
+    },
+    {
+      "name": "Alyse Brewer",
+      "email": "alyse.brewer@hsv-k12.org",
+      "phone": "(256) 762-8285",
+      "books": true
+    },
+    {
+      "name": "Kathleen Gentry",
+      "email": "gentryk1@charlottesvilleschools.org",
+      "phone": "",
+      "books": true
+    },
+    {
+      "name": "Dustin Robinson",
+      "email": "dustin.robinson16@yahoo.com",
+      "phone": "",
+      "books": true
+    },
+    {
+      "name": "Christina Lott",
+      "email": "clott.de@oxboe.com",
+      "phone": "",
+      "books": true
+    },
+    {
+      "name": "Jordan Patterson",
+      "email": "jpatterson.oe@oxboe.com",
+      "phone": "",
+      "books": true
+    },
+    {
+      "name": "Melanie Rice",
+      "email": "melanierice0216@gmail.com",
+      "phone": "",
+      "books": true,
+      "note": "See Medium Leads"
+    },
+    {
+      "name": "E Williams",
+      "email": "erwilliams@marion.k12.sc.us",
+      "phone": "",
+      "books": true,
+      "note": "See Medium Leads"
+    },
+    {
+      "name": "Sierra Golden",
+      "email": "sierra.golden@sccpss.com",
+      "phone": "",
+      "books": true
+    },
+    {
+      "name": "Callie Nunnally",
+      "email": "callien_nunnally@ccpsnet.net",
+      "phone": "",
+      "books": true,
+      "note": "See Medium Leads"
+    }
+  ],
+  "tier3": [
+    {
+      "name": "Danielle Hodge",
+      "email": "dhodge@mcpss.com",
+      "phone": "(251) 322-9229",
+      "role": "Other"
+    },
+    {
+      "name": "Laura Head",
+      "email": "lahead@hsd2.org",
+      "phone": "(719) 579-2147",
+      "role": "Other"
+    },
+    {
+      "name": "Beverly Cumbo",
+      "email": "bcumbo@nps.k12.va.us",
+      "phone": "",
+      "role": "Other"
+    },
+    {
+      "name": "Harriet Butts",
+      "email": "hmj.butts@gmail.com",
+      "phone": "",
+      "role": "Other"
+    },
+    {
+      "name": "Michael Mckenzie",
+      "email": "mimckenzie@petersburg.k12.va.us",
+      "phone": "",
+      "role": "Other",
+      "note": "See Medium Leads"
+    },
+    {
+      "name": "Stephanie Johnson",
+      "email": "stjohns6670@yahoo.com",
+      "phone": "",
+      "role": "Other"
+    },
+    {
+      "name": "Christine White",
+      "email": "cwhite@perrycountyal.org",
+      "phone": "",
+      "role": "Other"
+    },
+    {
+      "name": "Raven Vawters",
+      "email": "raven.finch26@gmail.com",
+      "phone": "",
+      "role": "Other"
+    },
+    {
+      "name": "Narquita Snowden",
+      "email": "nsnowden931@nps.k12.va.us",
+      "phone": "",
+      "role": "Other"
+    },
+    {
+      "name": "Carrie Miller",
+      "email": "carrie.miller@careertech.ok.gov",
+      "phone": "",
+      "role": "Unknown"
+    },
+    {
+      "name": "Amber Mcneal",
+      "email": "amber.mcneal@paisd.org",
+      "phone": "(409) 433-2400",
+      "role": "Unknown",
+      "note": "Already merged \u2014 see Data Notes"
+    },
+    {
+      "name": "Janiya Gresham",
+      "email": "jgresham@jefcoed.com",
+      "phone": "",
+      "role": "Unknown"
+    },
+    {
+      "name": "Tamara Edwards",
+      "email": "tedwards@atoka.org",
+      "phone": "",
+      "role": "Unknown"
+    },
+    {
+      "name": "Kat Y",
+      "email": "kathryn.patterson@stanlycountyschools.org",
+      "phone": "",
+      "role": "Unknown"
+    },
+    {
+      "name": "Tasha Thompson",
+      "email": "tthompson@vwsd.org",
+      "phone": "",
+      "role": "Unknown",
+      "note": "See Hot Leads \u2014 duplicate + AI opt-out flag"
+    }
+  ],
+  "thomasHandling": [
+    {
+      "name": "Scott Strainge",
+      "email": "sstrainge@gmail.com",
+      "phone": "",
+      "context": [
+        "Named referrals as top priority: \u201calmost 2000 last year in a school of 530 students\u201d",
+        "Asked \u201cCost?\u201d directly",
+        "Agreed to meet in person at the conference (\u201cback right corner at lunch\u201d)",
+        "Last message: \u201cLooking to book a slot for a review.\u201d"
+      ],
+      "script": "Scott \u2014 following up on our conversation at SREB. You mentioned referrals were your top concern (almost 2,000 last year for 530 students) and wanted to know cost. I'd like to get you booked for your free Discipline Review so we can scope exactly what a half-day or full engagement would look like for your school. Does this week work?",
+      "flags": []
+    },
+    {
+      "name": "Gina Sabol",
+      "email": "gsabol@horrycountyschools.net",
+      "phone": "(843) 488-7517",
+      "context": [
+        "Sat in the CHAOS session at SREB for a full hour",
+        "Wants a half-day PD training, morning session",
+        "~60 faculty and staff",
+        "Explicitly requested Dr. Glanton to present by name"
+      ],
+      "script": "Gina \u2014 thanks for sitting in on the session and for reaching out. For a half-day PD with ~60 staff, here's what that typically looks like and the investment involved... [confirm Tier 1 pricing $5K\u2013$8K scope]. Want me to get a date on the calendar for Dr. Glanton?",
+      "flags": []
+    }
+  ]
+};
+const STORAGE_KEY = 'edco_megan_queue_v1';
+
+function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function loadState(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){ return {}; }
+}
+function saveState(state){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){}
+}
+let state = loadState();
+
+function leadKey(section, idx, name){
+  return section + ':' + idx + ':' + name.replace(/\s+/g,'_');
+}
+
+const STATUS_OPTIONS = [
+  {v:'not_called', l:'Not called yet'},
+  {v:'called', l:'✓ Called'},
+  {v:'vm', l:'Left voicemail'},
+  {v:'no_answer', l:'No answer'},
+  {v:'booked', l:'★ Booked!'},
+];
+
+function statusSelect(key){
+  const current = state[key] || 'not_called';
+  const cls = current==='called'?'status-called':current==='vm'?'status-vm':current==='booked'?'status-booked':current==='no_answer'?'status-noanswer':'';
+  return `<select class="status-select ${cls}" data-key="${esc(key)}">
+    ${STATUS_OPTIONS.map(o=>`<option value="${o.v}" ${o.v===current?'selected':''}>${o.l}</option>`).join('')}
+  </select>`;
+}
+
+function renderComplianceList(){
+  const el = document.getElementById('complianceList');
+  el.innerHTML = DATA.compliance.map(c => `
+    <div class="flag-box">
+      <div class="title">${esc(c.name)} — ${esc(c.phone)}</div>
+      <div class="body">${esc(c.note)}</div>
+    </div>
+  `).join('');
+}
+
+function renderHotList(){
+  const el = document.getElementById('hotList');
+  el.innerHTML = DATA.hotLeads.map((lead, i) => {
+    const key = leadKey('hot', i, lead.name);
+    const isDone = ['called','booked'].includes(state[key]);
+    return `
+    <div class="lead-card ${isDone?'done':''}" data-key="${esc(key)}">
+      <div class="lead-head">
+        <div>
+          <div class="lead-name">${esc(lead.name)}</div>
+          <div class="lead-contact">
+            ${lead.email ? `<span>✉ ${esc(lead.email)}</span>` : ''}
+            ${lead.phone ? `<span>☎ ${esc(lead.phone)}</span>` : ''}
+          </div>
+        </div>
+        ${statusSelect(key)}
+      </div>
+      <ul class="context-list">${lead.context.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>
+      <div class="script-box"><div class="script-label">Suggested opener</div>${esc(lead.script)}</div>
+      ${lead.flags && lead.flags.length ? `<div class="lead-flags">${lead.flags.map(f=>`<div class="lead-flag">⚠ ${esc(f)}</div>`).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderMediumList(){
+  const el = document.getElementById('mediumList');
+  el.innerHTML = DATA.mediumLeads.map((lead, i) => {
+    const key = leadKey('medium', i, lead.email || lead.phone);
+    const isDone = ['called','booked'].includes(state[key]);
+    return `
+    <div class="lead-card ${isDone?'done':''}" data-key="${esc(key)}">
+      <div class="lead-head">
+        <div>
+          <div class="lead-name">${esc(lead.name)}</div>
+          <div class="lead-contact">
+            ${lead.email ? `<span>✉ ${esc(lead.email)}</span>` : ''}
+            ${lead.phone ? `<span>☎ ${esc(lead.phone)}</span>` : ''}
+          </div>
+        </div>
+        ${statusSelect(key)}
+      </div>
+      <ul class="context-list"><li><b>Stated pain:</b> ${esc(lead.pain)}</li></ul>
+    </div>`;
+  }).join('');
+}
+
+function renderTierList(containerId, list, sectionName, showRole){
+  const el = document.getElementById(containerId);
+  el.innerHTML = list.map((lead, i) => {
+    const key = leadKey(sectionName, i, lead.email || lead.name);
+    const isDone = ['called','booked'].includes(state[key]);
+    return `
+    <div class="simple-row ${isDone?'done':''}" data-key="${esc(key)}">
+      <div class="info">
+        <div class="name">${esc(lead.name)}</div>
+        <div class="meta">
+          ${showRole && lead.role ? `<span class="role-badge">${esc(lead.role)}</span>` : ''}
+          ${lead.books ? `<span class="books-badge">Also wants materials</span>` : ''}
+          ${lead.note ? `<span class="note-badge">${esc(lead.note)}</span>` : ''}
+        </div>
+        <div class="meta" style="margin-top:4px;">
+          ${lead.email ? `<span>✉ ${esc(lead.email)}</span>` : ''}
+          ${lead.phone ? `<span>☎ ${esc(lead.phone)}</span>` : ''}
+        </div>
+      </div>
+      ${statusSelect(key)}
+    </div>`;
+  }).join('');
+}
+
+function renderThomasHandling(){
+  const el = document.getElementById('thomasHandlingBody');
+  if(!DATA.thomasHandling || !DATA.thomasHandling.length){ el.innerHTML = ''; return; }
+  el.innerHTML = DATA.thomasHandling.map(l =>
+    `${esc(l.name)}${l.email ? ' — ' + esc(l.email) : ''}${l.phone ? ' — ' + esc(l.phone) : ''}`
+  ).join('<br>');
+}
+renderThomasHandling();
+
+renderComplianceList();
+renderHotList();
+renderMediumList();
+renderTierList('tier1List', DATA.tier1, 'tier1', true);
+renderTierList('tier2List', DATA.tier2, 'tier2', false);
+renderTierList('tier3List', DATA.tier3, 'tier3', true);
+
+// tab counts
+document.querySelector('.tab[data-tab="compliance"]').innerHTML = `⚠ Compliance <span class="count">${DATA.compliance.length}</span>`;
+document.querySelector('.tab[data-tab="hot"]').innerHTML = `🔥 Hot Leads <span class="count">${DATA.hotLeads.length}</span>`;
+document.querySelector('.tab[data-tab="medium"]').innerHTML = `🟡 Medium Leads <span class="count">${DATA.mediumLeads.length}</span>`;
+document.querySelector('.tab[data-tab="tier1"]').innerHTML = `Tier 1 — Principals/Admin <span class="count">${DATA.tier1.length}</span>`;
+document.querySelector('.tab[data-tab="tier2"]').innerHTML = `Tier 2 — Assistant Principals <span class="count">${DATA.tier2.length}</span>`;
+document.querySelector('.tab[data-tab="tier3"]').innerHTML = `Tier 3 — Qualify First <span class="count">${DATA.tier3.length}</span>`;
+
+// tabs
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+// status change handler (event delegation)
+document.body.addEventListener('change', e=>{
+  if(!e.target.classList.contains('status-select')) return;
+  const key = e.target.dataset.key;
+  const val = e.target.value;
+  state[key] = val;
+  saveState(state);
+  updateProgress();
+  // re-render the affected section to update card styling + select color
+  renderComplianceList(); renderHotList(); renderMediumList();
+  renderTierList('tier1List', DATA.tier1, 'tier1', true);
+  renderTierList('tier2List', DATA.tier2, 'tier2', false);
+  renderTierList('tier3List', DATA.tier3, 'tier3', true);
+});
+
+function updateProgress(){
+  const totalLeads = DATA.hotLeads.length + DATA.mediumLeads.length + DATA.tier1.length + DATA.tier2.length + DATA.tier3.length;
+  const doneCount = Object.values(state).filter(v => v==='called' || v==='booked').length;
+  document.getElementById('progressNum').textContent = `${doneCount} / ${totalLeads}`;
+  const pct = totalLeads ? Math.round((doneCount/totalLeads)*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+updateProgress();
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm("Reset all call progress? This clears every status you've set in this browser.")){
+    state = {};
+    saveState(state);
+    renderComplianceList(); renderHotList(); renderMediumList();
+    renderTierList('tier1List', DATA.tier1, 'tier1', true);
+    renderTierList('tier2List', DATA.tier2, 'tier2', false);
+    renderTierList('tier3List', DATA.tier3, 'tier3', true);
+    updateProgress();
+  }
+});
+</script>
+
+</body>
+</html>
